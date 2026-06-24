@@ -62,16 +62,16 @@ const Footer = () => {
             <Link to="/" className="flex flex-col gap-1.5">
               <div className="flex items-center gap-3">
                 <img src="https://res.cloudinary.com/duzwys877/image/upload/v1782295170/logo_rwarlx.png" alt="Vedamya Foods Logo" className="h-9 w-auto contrast-125" />
-                <span className="text-xl font-poppins font-bold tracking-tight text-[#6b4f3a] uppercase">
+                <span className="text-2xl font-poppins font-bold tracking-tight text-[#6b4f3a] uppercase">
                   Vedamya Foods
                 </span>
               </div>
-              <span className="text-[14px] text-[#976E2A] font-poppins font-bold tracking-[0.35em] uppercase">
+              <span className="text-base text-[#976E2A] font-poppins font-bold tracking-[0.35em] uppercase">
                 Nutrition • Purely Vedic
               </span>
             </Link>
 
-            <p className="text-sm text-[#605948] leading-relaxed max-w-xs italic font-medium">
+            <p className="text-base text-[#605948] leading-relaxed max-w-xs italic font-medium">
               "Crafted with reverence to authentic Vedic traditions. Operating at the intersection of purity and modern wellness."
             </p>
 
@@ -91,13 +91,13 @@ const Footer = () => {
 
           {/* Boutique Navigation Links */}
           <div className="col-span-1 lg:col-span-2 lg:col-start-6">
-            <h4 className="text-[14px] font-poppins font-bold uppercase tracking-[0.25em] text-[#976E2A] mb-6">
+            <h4 className="text-base font-poppins font-bold uppercase tracking-[0.25em] text-[#976E2A] mb-6">
               Links
             </h4>
             <ul className="flex flex-col gap-3.5">
               {footerLinks.explore.map((link) => (
                 <li key={link.name}>
-                  <Link to={link.path} className="text-sm font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
+                  <Link to={link.path} className="text-base font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
                     <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 opacity-70">▹</span>
                     {link.name}
                   </Link>
@@ -108,24 +108,24 @@ const Footer = () => {
 
           {/* Essentials Navigation Links */}
           <div className="col-span-1 lg:col-span-2">
-            <h4 className="text-[14px] font-poppins font-bold uppercase tracking-[0.25em] text-[#976E2A] mb-6">
+            <h4 className="text-base font-poppins font-bold uppercase tracking-[0.25em] text-[#976E2A] mb-6">
               Essential
             </h4>
             <ul className="flex flex-col gap-3.5">
               <li>
-                <Link to="/account" className="text-sm font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
+                <Link to="/account" className="text-base font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
                   <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 opacity-70">▹</span>
                   My Account
                 </Link>
               </li>
               <li>
-                <Link to="/orders" className="text-sm font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
+                <Link to="/orders" className="text-base font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
                   <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 opacity-70">▹</span>
                   My Orders
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-sm font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
+                <Link to="/contact" className="text-base font-poppins font-semibold text-[#605948] hover:text-[#976E2A] transition-colors flex items-center group">
                   <span className="w-0 overflow-hidden group-hover:w-3 transition-all duration-300 opacity-70">▹</span>
                   Support
                 </Link>
@@ -135,7 +135,7 @@ const Footer = () => {
 
           {/* Direct Contact Metadata Column */}
           <div className="col-span-2 md:col-span-1 lg:col-span-3">
-            <h4 className="text-[14px] font-poppins font-bold uppercase tracking-[0.25em] text-[#976E2A] mb-6">
+            <h4 className="text-base font-poppins font-bold uppercase tracking-[0.25em] text-[#976E2A] mb-6">
               Connect With Us
             </h4>
             <div className="flex flex-col gap-4">
@@ -144,7 +144,7 @@ const Footer = () => {
                 <div className="w-8 h-8 rounded-full bg-[#FFFDF6] flex items-center justify-center border border-[#E3DBC5] group-hover:bg-[#976E2A]/10 group-hover:border-[#976E2A]/40">
                   <Phone size={13} className="text-[#976E2A]" />
                 </div>
-                <span className="text-sm font-poppins font-semibold text-[#605948] group-hover:text-[#6b4f3a] transition-colors">
+                <span className="text-base font-poppins font-semibold text-[#605948] group-hover:text-[#6b4f3a] transition-colors">
                   +91 98765 43210
                 </span>
               </a>
@@ -153,7 +153,7 @@ const Footer = () => {
                 <div className="w-8 h-8 rounded-full bg-[#FFFDF6] flex items-center justify-center border border-[#E3DBC5] group-hover:bg-[#976E2A]/10 group-hover:border-[#976E2A]/40">
                   <Mail size={13} className="text-[#976E2A]" />
                 </div>
-                <span className="text-sm font-poppins font-semibold text-[#605948] group-hover:text-[#6b4f3a] transition-colors">
+                <span className="text-base font-poppins font-semibold text-[#605948] group-hover:text-[#6b4f3a] transition-colors">
                   vedamyafoods@gmail.com
                 </span>
               </a>
@@ -162,7 +162,7 @@ const Footer = () => {
                 <div className="w-8 h-8 rounded-full bg-[#FFFDF6] flex items-center justify-center border border-[#E3DBC5]">
                   <MapPin size={13} className="text-[#976E2A]" />
                 </div>
-                <span className="text-sm font-poppins font-medium text-[#605948]/80 leading-relaxed">
+                <span className="text-base font-poppins font-medium text-[#605948]/80 leading-relaxed">
                   Flagship Studio, Gaya, Bihar <br /> Republic of India
                 </span>
               </div>
@@ -172,7 +172,7 @@ const Footer = () => {
         </div>
 
         {/* --- BOTTOM ROW SECTION: LEGAL MATRIX & COPYRIGHT --- */}
-        <div className="pt-4 border-t border-[#E3DBC5] flex flex-col lg:flex-row justify-between items-center gap-4 text-[12px] font-poppins font-bold uppercase tracking-widest text-[#605948]/70">
+        <div className="pt-4 border-t border-[#E3DBC5] flex flex-col lg:flex-row justify-between items-center gap-4 text-sm font-poppins font-bold uppercase tracking-widest text-[#605948]/70">
 
           {/* Left Section: Legal & Copyright */}
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 order-2 lg:order-1">
@@ -200,7 +200,7 @@ const Footer = () => {
               href="https://letskillify.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#976E2A]/70 hover:text-[#6b4f3a] transition-colors tracking-[0.15em] text-[11px]"
+              className="text-[#976E2A]/70 hover:text-[#6b4f3a] transition-colors tracking-[0.15em] text-xs"
             >
               Designed by Letskillify
             </a>
