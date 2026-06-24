@@ -71,7 +71,7 @@ const Wishlist = () => {
               to="/shop"
               className="inline-flex items-center gap-4 px-12 py-6 bg-[#6b4f3a] text-[#FFFDF6] font-poppins font-bold text-[14px] uppercase tracking-[0.4em] rounded-2xl hover:bg-[#976E2A] transition-all duration-300 shadow-2xl shadow-[#6b4f3a]/10"
             >
-              Discover Boutique
+              Discover Our Products
               <ArrowRight size={14} />
             </Link>
           </motion.div>

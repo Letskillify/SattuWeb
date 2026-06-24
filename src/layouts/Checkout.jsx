@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../components/useAuth";
 import { db } from "../components/Firebase";
 import { collection, getDocs, addDoc, serverTimestamp, doc, deleteDoc } from "firebase/firestore";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, CreditCard, MapPin, User, Phone, Mail, CheckCircle, Sparkles, X, ShoppingBag, ShieldCheck, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageHeader from "../components/Sattu/PageHeader";
 
 const Checkout = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -39,9 +40,14 @@ const Checkout = () => {
         return;
       }
       try {
-        const snap = await getDocs(collection(db, "users", user.uid, "cart"));
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setItems(list);
+        // Check for Buy Now item in state
+        if (location.state?.buyNowItem) {
+          setItems([location.state.buyNowItem]);
+        } else {
+          const snap = await getDocs(collection(db, "users", user.uid, "cart"));
+          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          setItems(list);
+        }
         
         // Pre-fill user data if available
         setFormData(prev => ({
@@ -71,7 +77,7 @@ const Checkout = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const total = items.reduce((sum, i) => sum + (Number(i.price) || 0), 0);
+  const total = items.reduce((sum, i) => sum + (Number(i.price) || 0) * (i.quantity || 1), 0);
 
   const clearCart = async () => {
     try {
@@ -99,7 +105,10 @@ const Checkout = () => {
       });
       
       if (status === "confirmed") {
-        await clearCart();
+        // Only clear cart if it wasn't a Buy Now order
+        if (!location.state?.buyNowItem) {
+          await clearCart();
+        }
         setOrderStatus("success");
       } else {
         setOrderStatus("failed");

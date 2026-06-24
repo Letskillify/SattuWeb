@@ -70,27 +70,53 @@ export const StoreProvider = ({ children }) => {
     };
   }, [user]);
 
-  const addToCart = async (product) => {
-    const newItem = {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image || product.images?.[0] || "",
-      flavor: product.flavor || "",
-      addedAt: new Date().toISOString(),
-      quantity: 1
-    };
-
+  const addToCart = async (product, quantity = 1) => {
+    const existing = cart.find(i => i.id === product.id);
+    
     if (user) {
-      await setDoc(doc(db, "users", user.uid, "cart", product.id), newItem);
+      const itemRef = doc(db, "users", user.uid, "cart", product.id);
+      if (existing) {
+        await setDoc(itemRef, { 
+          ...existing, 
+          quantity: (existing.quantity || 1) + quantity 
+        }, { merge: true });
+      } else {
+        const newItem = {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image || product.images?.[0] || "",
+          flavor: product.flavor || "",
+          addedAt: new Date().toISOString(),
+          quantity: quantity
+        };
+        await setDoc(itemRef, newItem);
+      }
     } else {
       const currentCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
-      const existing = currentCart.find(i => i.id === product.id);
-      if (!existing) {
-        const updated = [...currentCart, newItem];
-        localStorage.setItem("guest_cart", JSON.stringify(updated));
-        setCart(updated);
+      const guestExisting = currentCart.find(i => i.id === product.id);
+      
+      let updated;
+      if (guestExisting) {
+        updated = currentCart.map(i => 
+          i.id === product.id 
+            ? { ...i, quantity: (i.quantity || 1) + quantity }
+            : i
+        );
+      } else {
+        const newItem = {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image || product.images?.[0] || "",
+          flavor: product.flavor || "",
+          addedAt: new Date().toISOString(),
+          quantity: quantity
+        };
+        updated = [...currentCart, newItem];
       }
+      localStorage.setItem("guest_cart", JSON.stringify(updated));
+      setCart(updated);
     }
   };
 

@@ -65,14 +65,30 @@ const ProductDetail = () => {
     setTimeout(() => setFeedbackMessage(null), 4000);
   };
 
+  const handleBuyNow = () => {
+    if (!product) return;
+    if (!user) {
+      navigate(`/login?redirect=product/${id}`);
+      return;
+    }
+    
+    const buyNowItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image || product.images?.[0] || "",
+      flavor: product.flavor || "",
+      quantity: quantity
+    };
+
+    navigate('/checkout', { state: { buyNowItem } });
+  };
+
   const addToCollection = async (type) => {
     if (!product) return;
 
     if (type === 'cart') {
-      if (isInCart) return;
-      for (let i = 0; i < quantity; i++) {
-        await addToCart(product);
-      }
+      await addToCart(product, quantity);
       triggerToast(`${quantity} ${quantity > 1 ? 'items' : 'item'} added to your cart!`);
     } else {
       if (isWishlisted) {
@@ -156,7 +172,7 @@ const ProductDetail = () => {
         <PageHeader
           breadcrumbItems={[
             { label: "Home", path: "/" },
-            { label: "Boutique", path: "/shop" },
+            { label: "Shop", path: "/shop" },
             { label: product.name }
           ]}
         />
@@ -249,44 +265,55 @@ const ProductDetail = () => {
             {/* Quantity & Actions */}
             <div className="mb-14">
               <label className="block text-xs font-bold text-[#8c7361] tracking-[0.2em] mb-4 uppercase">Quantity</label>
-              <div className="flex flex-col sm:flex-row items-stretch gap-4">
+              <div className="flex flex-col gap-4">
                 
                 {/* Quantity Selector */}
-                <div className="flex items-center justify-between border border-[#E8DCC4] rounded-xl bg-white px-2 h-14 w-full sm:w-32 shrink-0">
+                <div className="flex items-center justify-between border border-[#E8DCC4] rounded-xl bg-white px-4 h-14 w-full sm:w-40 shrink-0">
                   <button 
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="p-2 text-[#6b4f3a] hover:bg-[#F8F3E6] rounded-lg transition-colors"
                   >
-                    <Minus size={16}/>
+                    <Minus size={18}/>
                   </button>
-                  <span className="font-semibold text-lg text-[#3e2b1e]">{quantity}</span>
+                  <span className="font-bold text-lg text-[#3e2b1e]">{quantity}</span>
                   <button 
                     onClick={() => setQuantity(quantity + 1)}
                     className="p-2 text-[#6b4f3a] hover:bg-[#F8F3E6] rounded-lg transition-colors"
                   >
-                    <Plus size={16}/>
+                    <Plus size={18}/>
                   </button>
                 </div>
 
-                {/* Add to Cart */}
-                <button
-                  onClick={() => addToCollection('cart')}
-                  className={`flex-1 h-14 rounded-xl font-bold tracking-widest uppercase text-sm transition-all duration-300 flex items-center justify-center gap-3 shadow-md ${
-                    isInCart 
-                      ? "bg-[#c89b60] text-white cursor-default" 
-                      : "bg-[#5b4231] text-white hover:bg-[#4a3528]"
-                  }`}
-                >
-                  {isInCart ? "In Cart" : "Add to Cart"} <ShoppingBag size={18} />
-                </button>
+                {/* Action Buttons Row */}
+                <div className="flex items-center gap-3">
+                  {/* Add to Cart */}
+                  <button
+                    onClick={() => addToCollection('cart')}
+                    className={`flex-1 h-14 rounded-xl font-bold tracking-widest uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98] border ${
+                      isInCart 
+                        ? "bg-[#c89b60] text-white border-[#c89b60]" 
+                        : "bg-white text-[#5b4231] border-[#5b4231] hover:bg-[#FAF4E3]"
+                    }`}
+                  >
+                    {isInCart ? "Add More" : "Add to Cart"} <ShoppingBag size={18} />
+                  </button>
 
-                {/* Wishlist */}
-                <button
-                  onClick={() => addToCollection('wishlist')}
-                  className="w-14 h-14 shrink-0 border border-[#E8DCC4] rounded-xl bg-white hover:border-[#5b4231] flex items-center justify-center transition-colors group"
-                >
-                  <Heart size={20} className="text-[#5b4231] group-hover:scale-110 transition-transform" fill={isWishlisted ? "currentColor" : "none"} />
-                </button>
+                  {/* Buy Now */}
+                  <button
+                    onClick={handleBuyNow}
+                    className="flex-1 h-14 rounded-xl bg-[#5b4231] text-white font-bold tracking-widest uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 shadow-md hover:bg-[#4a3528] active:scale-[0.98]"
+                  >
+                    Buy Now <ChevronRight size={18} />
+                  </button>
+
+                  {/* Wishlist */}
+                  <button
+                    onClick={() => addToCollection('wishlist')}
+                    className="w-14 h-14 shrink-0 border border-[#E8DCC4] rounded-xl bg-white hover:border-[#5b4231] flex items-center justify-center transition-colors group"
+                  >
+                    <Heart size={20} className="text-[#5b4231] group-hover:scale-110 transition-transform" fill={isWishlisted ? "currentColor" : "none"} />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -365,33 +392,44 @@ const ProductDetail = () => {
       </div>
 
       {/* MOBILE ADD TO CART - FIXED BOTTOM */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-xl border-t border-[#E8DCC4] p-4 pb-8 flex items-center gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center justify-between border border-[#E8DCC4] rounded-xl bg-white px-2 h-16 w-32 shrink-0">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-2xl border-t border-[#E8DCC4] px-4 pt-3 pb-7 shadow-[0_-10px_30px_rgba(0,0,0,0.06)]">
+        {/* Quantity Row */}
+        <div className="flex items-center justify-between border border-[#E8DCC4] rounded-xl bg-white px-3 h-12 mb-3">
           <button 
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="p-2 text-[#6b4f3a] hover:bg-[#F8F3E6] rounded-lg transition-colors"
+            className="p-2 text-[#6b4f3a] active:bg-[#F8F3E6] rounded-lg transition-colors"
           >
-            <Minus size={16}/>
+            <Minus size={18}/>
           </button>
           <span className="font-bold text-lg text-[#3e2b1e]">{quantity}</span>
           <button 
             onClick={() => setQuantity(quantity + 1)}
-            className="p-2 text-[#6b4f3a] hover:bg-[#F8F3E6] rounded-lg transition-colors"
+            className="p-2 text-[#6b4f3a] active:bg-[#F8F3E6] rounded-lg transition-colors"
           >
-            <Plus size={16}/>
+            <Plus size={18}/>
           </button>
         </div>
 
-        <button
-          onClick={() => addToCollection('cart')}
-          className={`flex-1 h-16 rounded-2xl font-bold tracking-[0.15em] uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 shadow-lg active:scale-[0.98] ${
-            isInCart 
-              ? "bg-[#c89b60] text-white" 
-              : "bg-[#5b4231] text-white"
-          }`}
-        >
-          {isInCart ? "Already in Cart" : "Add to Cart"} <ShoppingBag size={18} />
-        </button>
+        {/* Buttons Row */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => addToCollection('cart')}
+            className={`flex-1 h-14 rounded-xl font-bold tracking-[0.1em] uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.97] border ${
+              isInCart 
+                ? "bg-[#c89b60] text-white border-[#c89b60]" 
+                : "bg-white text-[#5b4231] border-[#5b4231]"
+            }`}
+          >
+            {isInCart ? "Add More" : "Add to Cart"} <ShoppingBag size={18} />
+          </button>
+
+          <button
+            onClick={handleBuyNow}
+            className="flex-1 h-14 bg-[#5b4231] text-white rounded-xl font-bold tracking-[0.1em] uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-2 shadow-md active:scale-[0.97]"
+          >
+            Buy Now <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
 
       {/* ZOOM MODAL */}
