@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-cream: #FDFBF7;
+  --color-brand-olive: #4A5D4E;
+  --color-brand-olive-light: #5F7161;
+  --color-brand-beige: #E6DDC4;
+  --color-brand-brown: #6D4C3D;
+  --color-brand-brown-light: #8D7B68;
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  --font-poppins: "Cormorant Garamond", serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-subtle: pulse-subtle 3s ease-in-out infinite;
+}
+
+@layer base {
+  body {
+    @apply text-brand-olive font-poppins antialiased min-h-screen bg-[#FAF4E3] text-[14px];
+    background-image: url('https://res.cloudinary.com/duzwys877/image/upload/v1782293709/Body_qiypmm.jpg');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-variant-numeric: lining-nums;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/30 backdrop-blur-md border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-brand-olive/80 backdrop-blur-md border border-white/10;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(74, 93, 78, 0.2);
+  }
+  
+  .shadow-premium {
+    box-shadow: 0 20px 40px -15px rgba(74, 93, 78, 0.15);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+/* Custom Gradients */
+.bg-hero-gradient {
+  background: radial-gradient(circle at top right, #FDFBF7 0%, #E6DDC4 100%);
+}
+
+.bg-olive-gradient {
+  background: linear-gradient(135deg, #4A5D4E 0%, #354238 100%);
+}
+
+.grainy {
+  position: relative;
+}
+
+.grainy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("https://www.transparenttextures.com/patterns/p6-grain.png");
+}
