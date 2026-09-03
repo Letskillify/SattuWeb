@@ -16,9 +16,9 @@ const Contact = () => {
   };
 
   const communicationChannels = [
-    { icon: <Mail size={20} />, label: "Electronic Mail", val: "hello@sattudrink.com", href: "mailto:hello@sattudrink.com" },
+    { icon: <Mail size={20} />, label: "Electronic Mail", val: "info@vedamyafoods.com", href: "mailto:info@vedamyafoods.com" },
     { icon: <Phone size={20} />, label: "Direct Telephony", val: "+91 98765 43210", href: "tel:+919876543210" },
-    { icon: <MapPin size={20} />, label: "Apothecary Base", val: "Patna, Bihar, India", href: "#" }
+    { icon: <MapPin size={20} />, label: "Apothecary Base", val: "Indore, Madhya Pradhesh, India", href: "#" }
   ];
 
   return (

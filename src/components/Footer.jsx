@@ -144,9 +144,9 @@ const Footer = () => {
                   <Phone size={13} className="text-[#6b4f3]" strokeWidth={2} />
                   <span>+91 98765 43210</span>
                 </a>
-                <a href="mailto:hello@sattudrink.com" className="flex items-center gap-2.5 text-sm font-poppins text-[#4A574E] hover:text-[#6b4f3] transition-colors">
+                <a href="mailto:info@vedamyafoods.com" className="flex items-center gap-2.5 text-sm font-poppins text-[#4A574E] hover:text-[#6b4f3] transition-colors">
                   <Mail size={13} className="text-[#6b4f3]" strokeWidth={1.5} />
-                  <span>hello@sattudrink.com</span>
+                  <span>info@vedamyafoods.com</span>
                 </a>
               </div>
 
@@ -154,7 +154,7 @@ const Footer = () => {
                 <span className="text-[14px] font-poppins font-bold uppercase tracking-[0.15em] text-[#D9A036]">HQ & Hours</span>
                 <div className="flex items-center gap-2.5 text-sm font-poppins text-[#4A574E]">
                   <MapPin size={13} className="text-[#6b4f3]" strokeWidth={1.5} />
-                  <span>Bihar, India</span>
+                  <span>Indore, Madhya Pradhesh, India</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-sm font-poppins text-[#4A574E]">
                   <Clock size={13} className="text-[#6b4f3]" strokeWidth={1.5} />
@@ -169,9 +169,10 @@ const Footer = () => {
 
         {/* ================= BOTTOM LEGAL CREDITS BLOCK ================= */}
         <div className="pt-8 border-t border-[#D9D3C7] flex flex-col md:flex-row justify-between items-center gap-8">
-          <p className="text-[#707A72] font-poppins text-sm order-2 md:order-1">
-            © {currentYear} Sattu Drink. Executed with premium native integrity. All Rights Reserved.
-          </p>
+          <div className="text-[#707A72] font-poppins text-sm order-2 md:order-1 text-center md:text-left">
+            <p>© {currentYear} Vedamya Foods. All Rights Reserved.</p>
+            <p className="text-xs mt-1">Powered by Kavish Creation</p>
+          </div>
 
           {/* Grayscale Premium Payment Gateway Vectors */}
           <div className="flex items-center gap-6 order-1 md:order-2">

@@ -149,12 +149,12 @@ const Footer = () => {
                 </span>
               </a>
 
-              <a href="mailto:vedamyafoods@gmail.com" className="group flex items-center gap-3">
+              <a href="mailto:info@vedamyafoods.com" className="group flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#FFFDF6] flex items-center justify-center border border-[#E3DBC5] group-hover:bg-[#976E2A]/10 group-hover:border-[#976E2A]/40">
                   <Mail size={13} className="text-[#976E2A]" />
                 </div>
                 <span className="text-base font-poppins font-semibold text-[#605948] group-hover:text-[#6b4f3a] transition-colors">
-                  vedamyafoods@gmail.com
+                  info@vedamyafoods.com
                 </span>
               </a>
 
@@ -163,7 +163,7 @@ const Footer = () => {
                   <MapPin size={13} className="text-[#976E2A]" />
                 </div>
                 <span className="text-base font-poppins font-medium text-[#605948]/80 leading-relaxed">
-                  Flagship Studio, Gaya, Bihar <br /> Republic of India
+                  Indore, Madhya Pradesh <br /> India
                 </span>
               </div>
 
@@ -176,9 +176,10 @@ const Footer = () => {
 
           {/* Left Section: Legal & Copyright */}
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-2 order-2 lg:order-1">
-            <p className="text-[#605948]/50">
-              © {currentYear} Vedamya Foods
-            </p>
+            <div className="text-[#605948]/50 flex flex-col items-center lg:items-start">
+              <span>© {currentYear} Vedamya Foods</span>
+              <span className="text-xs mt-0.5">Powered by Kavish Creation</span>
+            </div>
             {footerLinks.legal.map(link => (
               <Link key={link.name} to={link.path} className="hover:text-[#976E2A] transition-colors">
                 {link.name}
