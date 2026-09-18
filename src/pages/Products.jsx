@@ -161,7 +161,6 @@ const ProductCard = ({ product, idx, triggerToast }) => {
           </span>
         </div>
 
-        {/* Product Name */}
         <h3 className="text-base font-poppins font-bold text-[#2E1A0C] mb-1 tracking-tight leading-snug line-clamp-1 group-hover:text-[#6b4f3a] transition-colors">
           {product.name}
         </h3>
