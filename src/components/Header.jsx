@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { User, Search, Menu, X, Leaf, Heart, ArrowRight, ShoppingBag, Sparkles, Home, Store } from 'lucide-react';
+import { User, Search, Menu, X, Leaf, Heart, ArrowRight, ShoppingBag, Sparkles, Home, Store, Boxes } from 'lucide-react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { useStore } from './StoreProvider';
@@ -40,7 +40,8 @@ const Header = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Shop', path: '/shop' },
+    { name: 'Sattu Shop', path: '/shop' },
+    { name: 'Products', path: '/products' },
     { name: 'About us', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -55,6 +56,7 @@ const Header = () => {
   };
 
   const mobileNavItems = [
+    { name: 'Products', icon: Boxes, path: '/products' },
     { name: 'Shop', icon: Store, path: '/shop' },
     { name: 'Wishlist', icon: Heart, path: '/wishlist', count: wishlistCount },
     { name: 'Home', icon: Home, path: '/' },

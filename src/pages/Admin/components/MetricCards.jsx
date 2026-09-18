@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Package, ShoppingCart, IndianRupee, Users } from 'lucide-react';
+import { Package, Boxes, ShoppingBag, IndianRupee, TrendingUp, Users } from 'lucide-react';
 import { db } from '../../../components/Firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 
 const MetricCards = () => {
   const [stats, setStats] = useState({
-    products: 0,
+    sattuProducts: 0,
+    otherProducts: 0,
     orders: 0,
     revenue: 0,
     users: 0
@@ -21,13 +22,18 @@ const MetricCards = () => {
           getDocs(collection(db, "users"))
         ]);
 
+        const allProducts = productsSnap.docs.map(d => d.data());
+        const sattuCount = allProducts.filter(p => p.productType !== "other").length;
+        const otherCount = allProducts.filter(p => p.productType === "other").length;
+
         const totalRevenue = ordersSnap.docs.reduce((acc, doc) => {
           const data = doc.data();
           return data.status === 'confirmed' ? acc + (Number(data.total) || 0) : acc;
         }, 0);
 
         setStats({
-          products: productsSnap.size,
+          sattuProducts: sattuCount,
+          otherProducts: otherCount,
           orders: ordersSnap.docs.filter(d => d.data().status === 'confirmed').length,
           revenue: totalRevenue,
           users: usersSnap.size
@@ -43,63 +49,75 @@ const MetricCards = () => {
 
   const metricCards = [
     {
-      label: "Total Products",
-      value: loading ? "..." : stats.products,
-      hint: "Across all flavors",
-      icon: Package,
-      color: "text-[#4A5D4E]",
-      bg: "bg-[#4A5D4E]/10"
-    },
-    {
-      label: "Open Orders",
-      value: loading ? "..." : stats.orders,
-      hint: "Confirmed & Pending",
-      icon: ShoppingCart,
-      color: "text-[#D9A036]",
-      bg: "bg-[#D9A036]/10"
-    },
-    {
       label: "Total Revenue",
       value: loading ? "..." : `₹${stats.revenue.toLocaleString('en-IN')}`,
-      hint: "Lifetime earnings",
+      hint: "Lifetime confirmed sales",
+      trend: "+18.4%",
       icon: IndianRupee,
-      color: "text-[#6D4C3D]",
-      bg: "bg-[#6D4C3D]/10"
+      color: "from-amber-500 to-amber-700",
+      iconBg: "bg-amber-100 text-amber-800"
     },
     {
-      label: "Active Users",
-      value: loading ? "..." : stats.users,
-      hint: "Registered customers",
-      icon: Users,
-      color: "text-[#6b4f3]",
-      bg: "bg-[#6b4f3]/10"
+      label: "Sattu Blends",
+      value: loading ? "..." : stats.sattuProducts,
+      hint: "Traditional sattu items",
+      trend: "Active Catalog",
+      icon: Package,
+      color: "from-emerald-600 to-emerald-800",
+      iconBg: "bg-emerald-100 text-emerald-800"
+    },
+    {
+      label: "Other Products",
+      value: loading ? "..." : stats.otherProducts,
+      hint: "Snacks, spices & grains",
+      trend: "Organic Items",
+      icon: Boxes,
+      color: "from-amber-600 to-[#976E2A]",
+      iconBg: "bg-amber-100 text-[#976E2A]"
+    },
+    {
+      label: "Confirmed Orders",
+      value: loading ? "..." : stats.orders,
+      hint: `${stats.users} registered customers`,
+      trend: "Live",
+      icon: ShoppingBag,
+      color: "from-[#6b4f3a] to-[#2A1B12]",
+      iconBg: "bg-[#6b4f3a]/10 text-[#6b4f3a]"
     },
   ];
 
   return (
-    <section className="grid gap-5 md:grid-cols-2 lg:grid-cols-4 mb-10">
+    <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
       {metricCards.map((card) => {
         const Icon = card.icon;
         return (
           <article
             key={card.label}
-            className="bg-white rounded-2xl border border-[#D9D3C7] shadow-sm hover:shadow-lg transition-all duration-300 group"
+            className="bg-white rounded-2xl border border-[#E5DEC9] shadow-[0_4px_25px_rgba(0,0,0,0.03)] hover:shadow-lg transition-all duration-300 relative overflow-hidden group p-6 flex flex-col justify-between"
           >
-            <div className="p-6">
-              <div className={`w-12 h-12 rounded-xl ${card.bg} ${card.color} flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}>
-                <Icon size={24} strokeWidth={2} />
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-2xl ${card.iconBg} flex items-center justify-center font-bold shadow-xs group-hover:scale-105 transition-transform`}>
+                  <Icon size={22} strokeWidth={2.2} />
+                </div>
+                <span className="inline-flex items-center gap-1 text-[11px] font-poppins font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full">
+                  <TrendingUp size={12} /> {card.trend}
+                </span>
               </div>
-              <p className="text-sm font-bold tracking-wider text-[#707A72] uppercase mb-2">
+
+              <p className="text-xs font-poppins font-bold uppercase tracking-wider text-[#7A6E63] mb-1">
                 {card.label}
               </p>
-              <p className="text-3xl font-poppins font-bold text-[#1C2B21] mb-1">
+              <h3 className="text-3xl font-poppins font-black text-[#2A1B12] tracking-tight mb-1">
                 {card.value}
-              </p>
-              <p className="text-sm font-medium text-[#707A72]">
-                {card.hint}
-              </p>
+              </h3>
             </div>
-            <div className="h-1.5 w-full rounded-b-2xl bg-gradient-to-r from-[#4A5D4E] via-[#D9A036] to-[#6D4C3D]" />
+
+            <div className="pt-3 border-t border-[#F2EDE2] mt-4 flex items-center justify-between">
+              <span className="text-xs text-[#7A6E63] font-medium">{card.hint}</span>
+            </div>
+
+            <div className={`h-1 w-full bg-gradient-to-r ${card.color} absolute bottom-0 left-0 right-0`} />
           </article>
         );
       })}

@@ -70,54 +70,77 @@ export const StoreProvider = ({ children }) => {
     };
   }, [user]);
 
-  const addToCart = async (product, quantity = 1) => {
-    const existing = cart.find(i => i.id === product.id);
+  const addToCart = async (product, quantity = 1, selectedVariant = null) => {
+    const variantWeight = selectedVariant?.weight || product.net_quantity || product.weight || "";
+    const variantPrice = selectedVariant?.price || product.price;
+    const maxStock = selectedVariant?.stock_count !== undefined 
+      ? Number(selectedVariant.stock_count) 
+      : (product.stock_count !== undefined ? Number(product.stock_count) : (selectedVariant?.stock_status === "Out of Stock" || product.stock_status === "Out of Stock" ? 0 : 50));
+    
+    const cartItemId = variantWeight ? `${product.id}_${variantWeight}` : product.id;
+    const existing = cart.find(i => i.id === cartItemId || i.id === product.id);
+    const currentQty = existing ? (existing.quantity || 1) : 0;
+    
+    // Cap at max available stock
+    const targetQty = Math.min(maxStock, currentQty + quantity);
+
+    if (maxStock <= 0 || targetQty <= 0) {
+      return false; // Out of stock
+    }
     
     if (user) {
-      const itemRef = doc(db, "users", user.uid, "cart", product.id);
+      const itemRef = doc(db, "users", user.uid, "cart", cartItemId);
       if (existing) {
         await setDoc(itemRef, { 
           ...existing, 
-          quantity: (existing.quantity || 1) + quantity 
+          quantity: targetQty,
+          stock_count: maxStock
         }, { merge: true });
       } else {
         const newItem = {
-          id: product.id,
+          id: cartItemId,
+          productId: product.id,
           name: product.name,
-          price: product.price,
+          price: variantPrice,
+          weight: variantWeight,
           image: product.image || product.images?.[0] || "",
           flavor: product.flavor || "",
+          stock_count: maxStock,
           addedAt: new Date().toISOString(),
-          quantity: quantity
+          quantity: targetQty
         };
         await setDoc(itemRef, newItem);
       }
     } else {
       const currentCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
-      const guestExisting = currentCart.find(i => i.id === product.id);
+      const guestExisting = currentCart.find(i => i.id === cartItemId || i.id === product.id);
       
       let updated;
       if (guestExisting) {
         updated = currentCart.map(i => 
-          i.id === product.id 
-            ? { ...i, quantity: (i.quantity || 1) + quantity }
+          (i.id === cartItemId || i.id === product.id)
+            ? { ...i, quantity: targetQty, stock_count: maxStock }
             : i
         );
       } else {
         const newItem = {
-          id: product.id,
+          id: cartItemId,
+          productId: product.id,
           name: product.name,
-          price: product.price,
+          price: variantPrice,
+          weight: variantWeight,
           image: product.image || product.images?.[0] || "",
           flavor: product.flavor || "",
+          stock_count: maxStock,
           addedAt: new Date().toISOString(),
-          quantity: quantity
+          quantity: targetQty
         };
         updated = [...currentCart, newItem];
       }
       localStorage.setItem("guest_cart", JSON.stringify(updated));
       setCart(updated);
     }
+    return true;
   };
 
   const removeFromCart = async (id) => {
@@ -166,18 +189,21 @@ export const StoreProvider = ({ children }) => {
   };
 
   const updateQuantity = async (id, delta) => {
+    const existing = cart.find(i => i.id === id);
+    if (!existing) return;
+
+    const maxStock = existing.stock_count !== undefined ? Number(existing.stock_count) : 50;
+    const currentQty = existing.quantity || 1;
+    const newQty = Math.min(maxStock, Math.max(1, currentQty + delta));
+
     if (user) {
       const itemRef = doc(db, "users", user.uid, "cart", id);
-      const existing = cart.find(i => i.id === id);
-      if (existing) {
-        const newQty = Math.max(1, (existing.quantity || 1) + delta);
-        await setDoc(itemRef, { ...existing, quantity: newQty }, { merge: true });
-      }
+      await setDoc(itemRef, { ...existing, quantity: newQty }, { merge: true });
     } else {
       const currentCart = JSON.parse(localStorage.getItem("guest_cart") || "[]");
       const updated = currentCart.map(item => {
         if (item.id === id) {
-          return { ...item, quantity: Math.max(1, (item.quantity || 1) + delta) };
+          return { ...item, quantity: newQty };
         }
         return item;
       });
@@ -186,8 +212,24 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  const clearCart = async () => {
+    if (user) {
+      try {
+        const snap = await getDocs(collection(db, "users", user.uid, "cart"));
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      } catch (err) {
+        console.error("Error clearing cart in Firestore:", err);
+      }
+    } else {
+      localStorage.removeItem("guest_cart");
+      setCart([]);
+    }
+  };
+
   return (
-    <StoreContext.Provider value={{ cart, wishlist, loading, addToCart, removeFromCart, updateQuantity, addToWishlist, removeFromWishlist }}>
+    <StoreContext.Provider value={{ cart, wishlist, loading, addToCart, removeFromCart, updateQuantity, clearCart, addToWishlist, removeFromWishlist }}>
       {children}
     </StoreContext.Provider>
   );

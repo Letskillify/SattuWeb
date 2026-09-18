@@ -10,21 +10,60 @@ import { useStore } from "../components/StoreProvider";
 const ProductCard = ({ product, idx, triggerToast }) => {
   const navigate = useNavigate();
   const { addToCart, addToWishlist, removeFromWishlist, wishlist, cart } = useStore();
-  const isWishlisted = wishlist.some(item => item.id === product.id);
-  const isInCart = cart.some(item => item.id === product.id);
+  
+  const variants = React.useMemo(() => {
+    if (product.variants && product.variants.length > 0) {
+      return product.variants;
+    }
+    return [
+      {
+        weight: product.net_quantity || product.weight || "500g",
+        price: product.price || 0,
+        original_price: product.original_price || product.mrp || Math.round((product.price || 0) * 1.25),
+        stock_status: product.stock_status || "In Stock"
+      }
+    ];
+  }, [product]);
 
-  // Dynamic Price Calculations
-  const displayPrice = product.price;
-  const originalPrice = product.mrp || Math.round(product.price * 1.25);
-  const savingsAmount = originalPrice - displayPrice;
-  const savingsPercent = Math.round((savingsAmount / originalPrice) * 100);
+  const defaultVariantIdx = React.useMemo(() => {
+    if (!variants || variants.length === 0) return 0;
+    const firstInStock = variants.findIndex(v => {
+      const count = v.stock_count !== undefined ? Number(v.stock_count) : (v.stock_status === "Out of Stock" ? 0 : 50);
+      return count > 0 && v.stock_status !== "Out of Stock";
+    });
+    return firstInStock !== -1 ? firstInStock : 0;
+  }, [variants]);
+
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(defaultVariantIdx);
+
+  useEffect(() => {
+    setSelectedVariantIdx(defaultVariantIdx);
+  }, [defaultVariantIdx]);
+
+  const currentVariant = variants[selectedVariantIdx] || variants[0];
+
+  const cartItemId = `${product.id}_${currentVariant.weight}`;
+  const existingInCart = cart.find(item => item.id === cartItemId || item.id === product.id);
+  const qtyInCart = existingInCart ? Number(existingInCart.quantity || 1) : 0;
+  const isInCart = qtyInCart > 0;
+  const isWishlisted = wishlist.some(item => item.id === product.id);
+
+  const displayPrice = currentVariant.price || product.price || 0;
+  const originalPrice = currentVariant.original_price || product.mrp || Math.round(displayPrice * 1.25);
+  const savingsAmount = originalPrice > displayPrice ? originalPrice - displayPrice : 0;
+  const savingsPercent = originalPrice > displayPrice ? Math.round((savingsAmount / originalPrice) * 100) : 0;
+  const stockCount = currentVariant.stock_count !== undefined 
+    ? Number(currentVariant.stock_count) 
+    : (currentVariant.stock_status === "Out of Stock" ? 0 : 50);
+  const isOutOfStock = stockCount <= 0;
+  const isMaxInCart = qtyInCart >= stockCount;
 
   const handleAction = async (e, type) => {
     e.stopPropagation();
     if (type === 'cart') {
-      if (isInCart) return;
-      await addToCart(product);
-      triggerToast("Added to your selection!");
+      if (isOutOfStock || isMaxInCart) return;
+      await addToCart(product, 1, currentVariant);
+      triggerToast(`Added "${product.name} (${currentVariant.weight})" to cart!`);
     } else {
       if (isWishlisted) {
         await removeFromWishlist(product.id);
@@ -43,80 +82,120 @@ const ProductCard = ({ product, idx, triggerToast }) => {
       viewport={{ once: true }}
       transition={{ delay: idx * 0.05 }}
       onClick={() => navigate(`/product/${product.id}`)}
-      className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] p-5 relative cursor-pointer hover:shadow-md transition-all duration-300 flex flex-col h-full border border-gray-100/60"
+      className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] p-5 relative cursor-pointer hover:shadow-md transition-all duration-300 flex flex-col h-full border border-gray-100/60 group"
     >
-      {/* 100% Accurate Top-Left Discount Badge */}
+      {/* Discount Badge */}
       {savingsPercent > 0 && (
-        <div className="absolute top-0 left-4 bg-[#6b4f3a] text-white px-2.5 py-2.5 flex flex-col items-center justify-center text-center rounded-b-sm z-10 min-w-[38px]">
-          <span className="text-[14px] font-sans font-bold leading-none tracking-tight">{savingsPercent}%</span>
-          <span className="text-[14px] font-poppins font-bold uppercase tracking-tighter mt-0.5">OFF</span>
+        <div className="absolute top-0 left-4 bg-[#6b4f3a] text-white px-2.5 py-2 flex flex-col items-center justify-center text-center rounded-b-sm z-10 min-w-[38px]">
+          <span className="text-[13px] font-sans font-bold leading-none tracking-tight">{savingsPercent}%</span>
+          <span className="text-[9px] font-poppins font-bold uppercase tracking-tighter mt-0.5">OFF</span>
         </div>
       )}
 
-      {/* Structured Image block containing the Pouch Graphic */}
+      {/* Numeric Stock Tag */}
+      <div className={`absolute top-3 right-3 z-10 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full border ${
+        stockCount > 5
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+          : stockCount > 0
+          ? "bg-amber-50 text-amber-700 border-amber-200"
+          : "bg-red-50 text-red-600 border-red-200"
+      }`}>
+        {stockCount > 5
+          ? `in stock`
+          : stockCount > 0
+          ? `Only ${stockCount} left!`
+          : "Out of Stock (0)"}
+      </div>
+
+      {/* Structured Image block */}
       <div className="relative w-full aspect-square flex items-center justify-center bg-transparent mb-3 overflow-hidden">
         <img
           src={product.image || product.images?.[0]}
           alt={product.name}
-          className="w-auto h-full max-h-full object-contain transition-transform duration-500 group-hover:scale-102"
+          className="w-auto h-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 
       {/* Content Meta Layer */}
       <div className="flex flex-col flex-grow">
-        {/* Category Flavour Label */}
-        <span className="text-[14px] font-poppins font-semibold uppercase tracking-wider text-gray-400 mb-0.5">
-          {product.flavor || "Dry Fruit"}
+        <span className="text-[12px] font-poppins font-semibold uppercase tracking-wider text-gray-400 mb-0.5">
+          {product.flavor || "Classic Roasted"}
         </span>
         
-        {/* Product Headline Title */}
         <h3 className="text-base font-poppins font-bold text-[#2E1A0C] mb-1 tracking-tight leading-snug line-clamp-1">
           {product.name}
         </h3>
 
-        {/* Ratings block */}
         <div className="flex items-center gap-1 mb-1">
           <div className="flex items-center">
             {[...Array(5)].map((_, i) => (
               <Star key={i} size={13} className="fill-[#F5A623] text-[#F5A623]" />
             ))}
           </div>
-          <span className="text-[14px] font-sans font-bold text-gray-700 ml-0.5">4.5</span>
-          <span className="text-[14px] font-sans text-gray-400">({product.reviewsCount || 125})</span>
+          <span className="text-[13px] font-sans font-bold text-gray-700 ml-0.5">4.5</span>
+          <span className="text-[13px] font-sans text-gray-400">({product.reviewsCount || 125})</span>
         </div>
 
-        {/* Net Quantity/Weight Metric Container */}
-        <span className="text-[14px] font-sans font-medium text-gray-400 mb-3 block">
-          {product.weight || "500g"}
-        </span>
-
-        {/* Pricing Layout Structure */}
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span className="text-xl font-sans font-extrabold text-[#2E1A0C]">
-            &nbsp;₹{displayPrice}
-          </span>
-          <span className="text-[14px] text-gray-400 line-through font-sans font-medium">
-            ₹{originalPrice}
-          </span>
-          <div className="bg-[#EAF7ED] text-[#218742] text-[14px] font-sans font-bold px-2 py-0.5 rounded-sm tracking-wide">
-            Save ₹{savingsAmount} ({savingsPercent}%)
+        {/* QUANTITY / WEIGHT VARIANT SELECTOR */}
+        {variants.length > 0 && (
+          <div className="my-2" onClick={(e) => e.stopPropagation()}>
+            <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">Select Pack Size:</div>
+            <div className="flex flex-wrap gap-1.5">
+              {variants.map((v, vIdx) => (
+                <button
+                  key={vIdx}
+                  type="button"
+                  onClick={() => setSelectedVariantIdx(vIdx)}
+                  className={`px-2.5 py-1 rounded text-xs font-bold transition-all border ${
+                    selectedVariantIdx === vIdx
+                      ? "bg-[#6b4f3a] text-white border-[#6b4f3a]"
+                      : v.stock_status === "Out of Stock"
+                      ? "bg-red-50 text-red-400 border-red-200 line-through opacity-70"
+                      : "bg-gray-50 text-gray-600 border-gray-200 hover:border-[#6b4f3a]"
+                  }`}
+                >
+                  {v.weight}
+                </button>
+              ))}
+            </div>
           </div>
+        )}
+
+        {/* Pricing Layout */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap mt-auto pt-2">
+          <span className="text-xl font-sans font-extrabold text-[#2E1A0C]">
+            ₹{displayPrice}
+          </span>
+          {originalPrice > displayPrice && (
+            <span className="text-[14px] text-gray-400 line-through font-sans font-medium">
+              ₹{originalPrice}
+            </span>
+          )}
+          {savingsAmount > 0 && (
+            <div className="bg-[#EAF7ED] text-[#218742] text-[11px] font-sans font-bold px-2 py-0.5 rounded-sm tracking-wide">
+              Save ₹{savingsAmount}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Fully Aligned Action Row Elements */}
+      {/* Action Buttons */}
       <div className="flex items-center gap-2 w-full mt-auto">
         <button
           onClick={(e) => handleAction(e, 'cart')}
-          disabled={isInCart}
-          className={`flex-1 text-[14px] font-poppins font-bold uppercase tracking-wider py-2.5 px-4 rounded transition-all duration-200 flex items-center justify-center gap-2 ${
-            isInCart
-              ? "bg-gray-100 text-gray-400 cursor-default"
+          disabled={isOutOfStock || isMaxInCart}
+          className={`flex-1 text-[13px] font-poppins font-bold uppercase tracking-wider py-2.5 px-4 rounded transition-all duration-200 flex items-center justify-center gap-2 ${
+            isOutOfStock
+              ? "bg-red-100 text-red-500 cursor-not-allowed border border-red-200"
+              : isMaxInCart
+              ? "bg-amber-100 text-amber-800 cursor-not-allowed border border-amber-200"
+              : isInCart
+              ? "bg-[#6b4f3a]/10 text-[#6b4f3a] border border-[#6b4f3a]/30"
               : "bg-[#6b4f3a] text-white hover:bg-[#25160C] shadow-sm"
           }`}
         >
-          <span>{isInCart ? "IN BAG" : "ADD TO CART"}</span>
-          <ShoppingBag size={13} strokeWidth={2.5} />
+          <span>{isOutOfStock ? "OUT OF STOCK" : isMaxInCart ? "MAX IN BAG" : isInCart ? "ADD MORE" : "ADD TO CART"}</span>
+          {!isOutOfStock && !isMaxInCart && <ShoppingBag size={13} strokeWidth={2.5} />}
         </button>
 
         <button

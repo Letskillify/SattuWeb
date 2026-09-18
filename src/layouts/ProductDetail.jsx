@@ -60,25 +60,72 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  const variants = React.useMemo(() => {
+    if (product?.variants && product.variants.length > 0) {
+      return product.variants;
+    }
+    if (!product) return [];
+    return [
+      {
+        weight: product.net_quantity || product.weight || "500g",
+        price: product.price || 0,
+        original_price: product.original_price || product.mrp || Math.round((product.price || 0) * 1.25),
+        stock_status: product.stock_status || "In Stock"
+      }
+    ];
+  }, [product]);
+
+  const defaultVariantIdx = React.useMemo(() => {
+    if (!variants || variants.length === 0) return 0;
+    const firstInStock = variants.findIndex(v => {
+      const count = v.stock_count !== undefined ? Number(v.stock_count) : (v.stock_status === "Out of Stock" ? 0 : 50);
+      return count > 0 && v.stock_status !== "Out of Stock";
+    });
+    return firstInStock !== -1 ? firstInStock : 0;
+  }, [variants]);
+
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(defaultVariantIdx);
+
+  useEffect(() => {
+    setSelectedVariantIdx(defaultVariantIdx);
+  }, [defaultVariantIdx]);
+
+  const currentVariant = variants[selectedVariantIdx] || variants[0] || {};
+  const currentPrice = currentVariant.price || product?.price || 0;
+  const currentOriginalPrice = currentVariant.original_price || product?.original_price || Math.round(currentPrice * 1.25);
+  const stockCount = currentVariant.stock_count !== undefined 
+    ? Number(currentVariant.stock_count) 
+    : (currentVariant.stock_status === "Out of Stock" ? 0 : 50);
+  const isOutOfStock = stockCount <= 0;
+
+  const cartItemId = `${product?.id}_${currentVariant.weight || ''}`;
+  const existingInCart = cart.find(i => i.id === cartItemId || i.id === product?.id);
+  const qtyInCart = existingInCart ? Number(existingInCart.quantity || 1) : 0;
+  const maxAvailableToAdd = Math.max(0, stockCount - qtyInCart);
+  const isMaxInCart = qtyInCart >= stockCount;
+
   const triggerToast = (msg) => {
     setFeedbackMessage(msg);
     setTimeout(() => setFeedbackMessage(null), 4000);
   };
 
   const handleBuyNow = () => {
-    if (!product) return;
+    if (!product || isOutOfStock || isMaxInCart) return;
     if (!user) {
       navigate(`/login?redirect=product/${id}`);
       return;
     }
     
     const buyNowItem = {
-      id: product.id,
+      id: `${product.id}_${currentVariant.weight || ''}`,
+      productId: product.id,
       name: product.name,
-      price: product.price,
+      price: currentPrice,
+      weight: currentVariant.weight || product.net_quantity || "",
       image: product.image || product.images?.[0] || "",
       flavor: product.flavor || "",
-      quantity: quantity
+      stock_count: stockCount,
+      quantity: Math.min(quantity, maxAvailableToAdd > 0 ? maxAvailableToAdd : 1)
     };
 
     navigate('/checkout', { state: { buyNowItem } });
@@ -88,8 +135,14 @@ const ProductDetail = () => {
     if (!product) return;
 
     if (type === 'cart') {
-      await addToCart(product, quantity);
-      triggerToast(`${quantity} ${quantity > 1 ? 'items' : 'item'} added to your cart!`);
+      if (isOutOfStock) return;
+      if (isMaxInCart) {
+        triggerToast(`That's all stock left (${stockCount} units in your cart)`);
+        return;
+      }
+      const actualQtyToAdd = Math.min(quantity, maxAvailableToAdd);
+      await addToCart(product, actualQtyToAdd, currentVariant);
+      triggerToast(`${actualQtyToAdd} ${actualQtyToAdd > 1 ? 'items' : 'item'} (${currentVariant.weight}) added to your cart!`);
     } else {
       if (isWishlisted) {
         await removeFromWishlist(product.id);
@@ -222,8 +275,8 @@ const ProductDetail = () => {
           {/* RIGHT: DETAILS */}
           <div className="w-full lg:w-1/2 flex flex-col justify-center">
             
-            {/* Reviews */}
-            <div className="flex items-center gap-3 mb-4">
+            {/* Reviews & Stock Badge */}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
               <div className="flex gap-1 text-[#c89b60]">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} size={15} fill="currentColor" stroke="none" />
@@ -231,6 +284,15 @@ const ProductDetail = () => {
               </div>
               <span className="text-sm font-medium text-[#8c7361]">
                 {product.rating || '4.5'} ({product.reviews_count || '125'} Verified Reviews)
+              </span>
+              <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${
+                stockCount > 5
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  : stockCount > 0
+                  ? "bg-amber-50 text-amber-800 border-amber-200"
+                  : "bg-red-50 text-red-800 border-red-200"
+              }`}>
+                {stockCount > 5 ? `In Stock` : stockCount > 0 ? `Only ${stockCount} Units Left!` : "Out of Stock (0)"}
               </span>
             </div>
 
@@ -241,8 +303,47 @@ const ProductDetail = () => {
 
             {/* Subtitle/Description */}
             <p className="text-[#6b4f3a] mb-8 leading-relaxed text-base lg:text-md">
-              {product.short_description || "A delicious blend of premium sattu with dry fruits. Rich in protein, fibre & essential nutrients."}
+              {product.short_description || product.description || "A delicious blend of premium sattu & organic ingredients. Rich in protein, fibre & essential nutrients."}
             </p>
+
+            {/* WEIGHT / QUANTITY VARIANT TIERS */}
+            {variants.length > 0 && (
+              <div className="mb-6 bg-white/70 p-4 rounded-2xl border border-[#E8DCC4]">
+                <label className="block text-xs font-bold text-[#8c7361] tracking-[0.2em] mb-3 uppercase">
+                  Select Pack Size / Quantity:
+                </label>
+                <div className="flex flex-wrap gap-2.5">
+                  {variants.map((v, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedVariantIdx(idx)}
+                      className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border flex items-center gap-2 ${
+                        selectedVariantIdx === idx
+                          ? "bg-[#5b4231] text-white border-[#5b4231] shadow-sm"
+                          : v.stock_status === "Out of Stock"
+                          ? "bg-red-50 text-red-400 border-red-200 line-through opacity-70"
+                          : "bg-white text-[#4a3b32] border-[#E8DCC4] hover:border-[#5b4231]"
+                      }`}
+                    >
+                      <span>{v.weight}</span>
+                      <span className={`text-[11px] px-1.5 py-0.5 rounded font-medium ${
+                        selectedVariantIdx === idx
+                          ? "bg-white/20 text-white"
+                          : "bg-gray-100 text-gray-600"
+                      }`}>
+                        ₹{v.price}
+                      </span>
+                      {v.stock_status && v.stock_status !== "In Stock" && (
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                          {v.stock_status}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <div className="flex items-center mb-8">
@@ -253,18 +354,27 @@ const ProductDetail = () => {
 
             {/* Price Row */}
             <div className="flex flex-wrap items-center gap-5 mb-10">
-              <span className="text-3xl lg:text-4xl font-serif text-[#3e2b1e]">₹{product.price || '350'}</span>
-              {(product.original_price || '450') && (
-                <span className="text-2xl text-[#8c7361] line-through font-serif">₹{product.original_price || '450'}</span>
+              <span className="text-3xl lg:text-4xl font-serif text-[#3e2b1e]">₹{currentPrice}</span>
+              {currentOriginalPrice > currentPrice && (
+                <span className="text-2xl text-[#8c7361] line-through font-serif">₹{currentOriginalPrice}</span>
               )}
-              <span className="bg-[#c89b60] text-white px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide shadow-sm">
-                Save ₹{(product.original_price || 450) - (product.price || 350)}
-              </span>
+              {currentOriginalPrice > currentPrice && (
+                <span className="bg-[#c89b60] text-white px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide shadow-sm">
+                  Save ₹{currentOriginalPrice - currentPrice}
+                </span>
+              )}
             </div>
 
             {/* Quantity & Actions */}
             <div className="mb-14">
-              <label className="block text-xs font-bold text-[#8c7361] tracking-[0.2em] mb-4 uppercase">Quantity</label>
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-xs font-bold text-[#8c7361] tracking-[0.2em] uppercase">Item Count</label>
+                {isMaxInCart && (
+                  <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+                    That's all stock left ({stockCount} units in cart)
+                  </span>
+                )}
+              </div>
               <div className="flex flex-col gap-4">
                 
                 {/* Quantity Selector */}
@@ -277,8 +387,14 @@ const ProductDetail = () => {
                   </button>
                   <span className="font-bold text-lg text-[#3e2b1e]">{quantity}</span>
                   <button 
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-2 text-[#6b4f3a] hover:bg-[#F8F3E6] rounded-lg transition-colors"
+                    onClick={() => setQuantity(prev => (maxAvailableToAdd > 0 ? Math.min(prev + 1, maxAvailableToAdd) : prev))}
+                    disabled={quantity >= maxAvailableToAdd || isMaxInCart || isOutOfStock}
+                    title={quantity >= maxAvailableToAdd || isMaxInCart ? "That's all stock left" : "Increase quantity"}
+                    className={`p-2 transition-colors rounded-lg ${
+                      quantity >= maxAvailableToAdd || isMaxInCart || isOutOfStock
+                        ? "text-gray-300 cursor-not-allowed opacity-40"
+                        : "text-[#6b4f3a] hover:bg-[#F8F3E6]"
+                    }`}
                   >
                     <Plus size={18}/>
                   </button>
@@ -289,19 +405,29 @@ const ProductDetail = () => {
                   {/* Add to Cart */}
                   <button
                     onClick={() => addToCollection('cart')}
-                    className={`flex-1 h-14 rounded-xl font-bold tracking-widest uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98] border ${
-                      isInCart 
+                    disabled={isOutOfStock || isMaxInCart}
+                    className={`flex-1 h-14 rounded-xl font-bold tracking-widest uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 border ${
+                      isOutOfStock
+                        ? "bg-red-100 text-red-500 border-red-200 cursor-not-allowed"
+                        : isMaxInCart
+                        ? "bg-amber-100 text-amber-800 border-amber-300 cursor-not-allowed"
+                        : isInCart 
                         ? "bg-[#c89b60] text-white border-[#c89b60]" 
                         : "bg-white text-[#5b4231] border-[#5b4231] hover:bg-[#FAF4E3]"
                     }`}
                   >
-                    {isInCart ? "Add More" : "Add to Cart"} <ShoppingBag size={18} />
+                    {isOutOfStock ? "Out of Stock" : isMaxInCart ? "Max In Bag" : isInCart ? "Add More" : "Add to Cart"} {!isOutOfStock && !isMaxInCart && <ShoppingBag size={18} />}
                   </button>
 
                   {/* Buy Now */}
                   <button
                     onClick={handleBuyNow}
-                    className="flex-1 h-14 rounded-xl bg-[#5b4231] text-white font-bold tracking-widest uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 shadow-md hover:bg-[#4a3528] active:scale-[0.98]"
+                    disabled={isOutOfStock || isMaxInCart}
+                    className={`flex-1 h-14 rounded-xl font-bold tracking-widest uppercase text-[13px] transition-all duration-300 flex items-center justify-center gap-3 shadow-md ${
+                      isOutOfStock || isMaxInCart
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        : "bg-[#5b4231] text-white hover:bg-[#4a3528] active:scale-[0.98]"
+                    }`}
                   >
                     Buy Now <ChevronRight size={18} />
                   </button>

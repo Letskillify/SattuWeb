@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../../../components/Firebase';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { ShoppingBag, CreditCard, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 const statusBadgeClasses = (status) => {
-  switch (status) {
+  switch (status?.toLowerCase()) {
     case "confirmed":
-      return "bg-emerald-50 text-emerald-700 border-emerald-100";
+    case "completed":
+      return "bg-emerald-50 text-emerald-800 border-emerald-200";
     case "failed":
-      return "bg-red-50 text-red-700 border-red-100";
+    case "cancelled":
+      return "bg-red-50 text-red-700 border-red-200";
     default:
-      return "bg-amber-50 text-amber-700 border-amber-100";
+      return "bg-amber-50 text-amber-800 border-amber-200";
   }
 };
 
@@ -33,25 +36,29 @@ const OrdersTable = () => {
   }, []);
 
   return (
-    <section className="bg-white rounded-2xl border border-[#D9D3C7] shadow-sm overflow-hidden">
-      <div className="px-6 py-5 flex items-center justify-between border-b border-[#D9D3C7]">
+    <section className="bg-white rounded-3xl border border-[#E5DEC9] shadow-[0_4px_25px_rgba(0,0,0,0.03)] overflow-hidden">
+      <div className="p-6 border-b border-[#E5DEC9] bg-[#FDFBF7] flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-poppins font-bold text-[#1C2B21]">Recent Orders</h2>
-          <p className="text-sm text-[#707A72] mt-1">Latest customer transactions</p>
+          <h2 className="text-xl font-poppins font-black text-[#2A1B12] tracking-tight">Recent Transactions</h2>
+          <p className="text-xs text-[#7A6E63] font-medium mt-1">Latest customer orders & payment records</p>
         </div>
+        <span className="px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold uppercase tracking-wider">
+          {orders.length} Recent Orders
+        </span>
       </div>
+
       <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-[#EFECE6]">
-            <tr className="text-[12px] font-bold text-[#4A5D4E] uppercase tracking-widest">
-              <th className="px-6 py-4">ID</th>
-              <th className="px-6 py-4">Customer</th>
-              <th className="px-6 py-4">Total</th>
-              <th className="px-6 py-4">Method</th>
+        <table className="min-w-full text-left text-xs">
+          <thead className="bg-[#F7F4EE] border-b border-[#E5DEC9]">
+            <tr className="text-[11px] font-poppins font-black text-[#6b4f3a] uppercase tracking-widest">
+              <th className="px-6 py-4">Order ID</th>
+              <th className="px-6 py-4">Customer Details</th>
+              <th className="px-6 py-4">Total Amount</th>
+              <th className="px-6 py-4">Payment Method</th>
               <th className="px-6 py-4">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#D9D3C7]">
+          <tbody className="divide-y divide-[#E5DEC9]/60">
             {loading ? (
               <tr>
                 <td colSpan="5" className="px-6 py-12 text-center text-gray-400">Loading orders...</td>
@@ -59,27 +66,38 @@ const OrdersTable = () => {
             ) : orders.length > 0 ? (
               orders.map((order) => (
                 <tr key={order.id} className="hover:bg-[#FDFBF7] transition-colors font-sans">
-                  <td className="px-6 py-4 font-bold text-[#1C2B21]">
-                    #{order.id.slice(0, 6).toUpperCase()}
+                  <td className="px-6 py-4 font-poppins font-bold text-[#2A1B12]">
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag size={14} className="text-[#976E2A]" />
+                      <span>#{order.id.slice(0, 8).toUpperCase()}</span>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-[#1C2B21] font-medium">{order.shipping?.name || "Member"}</p>
-                    <p className="text-[12px] text-[#707A72]">{order.userEmail}</p>
+                    <p className="text-[#2A1B12] font-bold text-xs">{order.shipping?.name || "Member Customer"}</p>
+                    <p className="text-[11px] text-[#7A6E63] font-medium">{order.userEmail || "Guest checkout"}</p>
                   </td>
-                  <td className="px-6 py-4 text-[#1C2B21] font-bold text-[15px]">₹{order.total}</td>
-                  <td className="px-6 py-4 text-[#707A72] uppercase text-[12px] font-bold tracking-wider">{order.paymentMethod}</td>
+                  <td className="px-6 py-4 text-[#2A1B12] font-black text-sm">
+                    ₹{order.total || 0}
+                  </td>
+                  <td className="px-6 py-4 text-[#7A6E63] font-bold text-[11px] uppercase tracking-wider">
+                    <span className="flex items-center gap-1.5">
+                      <CreditCard size={13} className="text-[#976E2A]" />
+                      {order.paymentMethod || "COD / Online"}
+                    </span>
+                  </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-flex items-center px-4 py-1.5 rounded-lg border text-[11px] font-bold uppercase tracking-widest ${statusBadgeClasses(order.status)}`}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${statusBadgeClasses(order.status)}`}
                     >
-                      {order.status}
+                      {order.status === "confirmed" ? <CheckCircle size={12} /> : <Clock size={12} />}
+                      {order.status || "Pending"}
                     </span>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-gray-400">No recent orders found.</td>
+                <td colSpan="5" className="px-6 py-12 text-center text-gray-400">No recent transactions recorded yet.</td>
               </tr>
             )}
           </tbody>

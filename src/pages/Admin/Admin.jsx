@@ -22,7 +22,8 @@ import OrdersTable from "./components/OrdersTable";
 import UsersTable from "./components/UsersTable";
 import FlavorsOverview from "./components/FlavorsOverview";
 import SattuProductForm from "./components/ProductForm";
-import { X } from "lucide-react";
+import OtherProductForm from "./components/OtherProductForm";
+import { X, Package, Boxes } from "lucide-react";
 import { useAuth } from "../../components/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -41,8 +42,10 @@ export const uploadToCloudinary = async (file) => {
 
 const Admin = () => {
   const [activeItem, setActiveItem] = useState("Dashboard");
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isSattuModalOpen, setIsSattuModalOpen] = useState(false);
+  const [isOtherModalOpen, setIsOtherModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [users, setUsers] = useState([]);
@@ -56,10 +59,14 @@ const Admin = () => {
   }, [user, navigate]);
 
   const loadProducts = async () => {
-    const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    setProducts(list);
+    try {
+      const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setProducts(list);
+    } catch (err) {
+      console.error("Error loading products:", err);
+    }
   };
 
   const loadUsers = async () => {
@@ -93,7 +100,8 @@ const Admin = () => {
       ...docData,
       createdAt: serverTimestamp(),
     });
-    setIsProductModalOpen(false);
+    setIsSattuModalOpen(false);
+    setIsOtherModalOpen(false);
     await loadProducts();
   };
 
@@ -105,19 +113,42 @@ const Admin = () => {
     await loadProducts();
   };
 
+  const sattuProducts = products.filter((p) => p.productType !== "other");
+  const otherProducts = products.filter((p) => p.productType === "other");
+
   const renderMainContent = () => {
     switch (activeItem) {
+      case "Sattu Products":
       case "Products":
         return (
           <>
             <MetricCards />
             <ProductsTable
-              products={products}
+              products={sattuProducts}
               onEdit={handleEditClick}
               onDelete={handleDeleteProduct}
+              title="Sattu Blends Catalog"
+              subtitle="Manage traditional roasted chana sattu products"
+              isOther={false}
             />
           </>
         );
+
+      case "Other Products":
+        return (
+          <>
+            <MetricCards />
+            <ProductsTable
+              products={otherProducts}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteProduct}
+              title="Other Products Catalog"
+              subtitle="Manage snacks, spices, grains, oils, and other food items"
+              isOther={true}
+            />
+          </>
+        );
+
       case "Orders":
         return (
           <>
@@ -125,6 +156,7 @@ const Admin = () => {
             <OrdersTable />
           </>
         );
+
       case "Flavors":
         return (
           <>
@@ -132,6 +164,7 @@ const Admin = () => {
             <FlavorsOverview />
           </>
         );
+
       case "Users":
         return (
           <>
@@ -139,102 +172,144 @@ const Admin = () => {
             <UsersTable users={users} />
           </>
         );
+
       default:
         return (
           <>
             <MetricCards />
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-8 lg:grid-cols-2 mb-8">
               <ProductsTable
-                products={products}
+                products={sattuProducts}
                 onEdit={handleEditClick}
                 onDelete={handleDeleteProduct}
+                title="Sattu Blends"
+                subtitle="Recent sattu products"
+                isOther={false}
               />
-              <OrdersTable />
+              <ProductsTable
+                products={otherProducts}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteProduct}
+                title="Other Products"
+                subtitle="Recent food & organic items"
+                isOther={true}
+              />
             </div>
+            <OrdersTable />
           </>
         );
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-[#EFECE6] text-[#1C2B21]">
+    <div className="min-h-screen flex bg-[#F7F4EE] text-[#2A1B12] font-sans selection:bg-[#D9A036] selection:text-white">
       <AdminSidebar activeItem={activeItem} setActiveItem={setActiveItem} />
 
-      <main className="flex-1 px-6 py-8 md:px-10 lg:px-12 overflow-auto">
+      <main className="flex-1 px-6 py-8 md:px-10 lg:px-12 overflow-y-auto">
         <div className="max-w-7xl mx-auto">
-          <AdminHeader activeItem={activeItem} />
-
-          {activeItem === "Products" && (
-            <div className="flex justify-end mb-6">
-              <button
-                type="button"
-                onClick={() => setIsProductModalOpen(true)}
-                className="px-6 py-3 rounded-xl bg-[#6b4f3b] text-white text-sm font-bold shadow-lg shadow-[#6b4f3b]/20 hover:bg-[#112517] hover:-translate-y-0.5 transition-all flex items-center gap-2"
-              >
-                Add New Product
-              </button>
-            </div>
-          )}
+          <AdminHeader
+            activeItem={activeItem}
+            onOpenSattuModal={() => setIsSattuModalOpen(true)}
+            onOpenOtherModal={() => setIsOtherModalOpen(true)}
+          />
 
           {renderMainContent()}
         </div>
       </main>
 
-      {isProductModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-7 py-5 border-b border-[#D9D3C7] flex items-center justify-between">
+      {/* Add Sattu Product Modal */}
+      {isSattuModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1B12]/70 backdrop-blur-md p-4">
+          <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5DEC9]">
+            <div className="px-8 py-6 border-b border-[#E5DEC9] flex items-center justify-between sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md z-10">
               <div>
-                <h2 className="text-xl font-poppins font-bold text-[#1C2B21]">
+                <h2 className="text-xl font-poppins font-black text-[#2A1B12] flex items-center gap-2">
+                  <Package className="text-[#6b4f3a]" size={22} />
                   Add New Sattu Product
                 </h2>
-                <p className="text-sm text-[#707A72] mt-1">
-                  Fill in the details for your new sattu mix
+                <p className="text-xs text-[#7A6E63] font-medium mt-1">
+                  Configure flavor, description, and numeric stock weight variants
                 </p>
               </div>
               <button
                 type="button"
-                onClick={() => setIsProductModalOpen(false)}
-                className="p-2 hover:bg-[#EFECE6] rounded-lg transition-colors"
+                onClick={() => setIsSattuModalOpen(false)}
+                className="p-2.5 hover:bg-[#E5DEC9] rounded-xl transition-colors text-[#7A6E63] hover:text-[#2A1B12]"
               >
-                <X size={20} className="text-[#707A72]" />
+                <X size={20} />
               </button>
             </div>
-            <div className="px-7 py-6">
-              <SattuProductForm
-                onSuccess={handleAddProductSubmit}
-              />
+            <div className="px-8 py-6">
+              <SattuProductForm onSuccess={handleAddProductSubmit} />
             </div>
           </div>
         </div>
       )}
 
-      {isEditModalOpen && editingProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-7 py-5 border-b border-[#D9D3C7] flex items-center justify-between">
+      {/* Add Other Product Modal */}
+      {isOtherModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1B12]/70 backdrop-blur-md p-4">
+          <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5DEC9]">
+            <div className="px-8 py-6 border-b border-[#E5DEC9] flex items-center justify-between sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md z-10">
               <div>
-                <h2 className="text-xl font-poppins font-bold text-[#1C2B21]">
-                  Edit Product
+                <h2 className="text-xl font-poppins font-black text-[#2A1B12] flex items-center gap-2">
+                  <Boxes className="text-[#976E2A]" size={22} />
+                  Add New Other Organic Product
                 </h2>
-                <p className="text-sm text-[#707A72] mt-1">
-                  Update details for {editingProduct.name}
+                <p className="text-xs text-[#7A6E63] font-medium mt-1">
+                  Add snacks, spices, grains, oils, or organic food products
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOtherModalOpen(false)}
+                className="p-2.5 hover:bg-[#E5DEC9] rounded-xl transition-colors text-[#7A6E63] hover:text-[#2A1B12]"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="px-8 py-6">
+              <OtherProductForm onSuccess={handleAddProductSubmit} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Product Modal */}
+      {isEditModalOpen && editingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1B12]/70 backdrop-blur-md p-4">
+          <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5DEC9]">
+            <div className="px-8 py-6 border-b border-[#E5DEC9] flex items-center justify-between sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md z-10">
+              <div>
+                <h2 className="text-xl font-poppins font-black text-[#2A1B12]">
+                  Edit {editingProduct.productType === "other" ? "Other Product" : "Sattu Product"}
+                </h2>
+                <p className="text-xs text-[#7A6E63] font-medium mt-1">
+                  Update details & quantity stock tiers for {editingProduct.name}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-2 hover:bg-[#EFECE6] rounded-lg transition-colors"
+                className="p-2.5 hover:bg-[#E5DEC9] rounded-xl transition-colors text-[#7A6E63] hover:text-[#2A1B12]"
               >
-                <X size={20} className="text-[#707A72]" />
+                <X size={20} />
               </button>
             </div>
-            <div className="px-7 py-6">
-              <SattuProductForm
-                product={editingProduct}
-                isEdit={true}
-                onSuccess={handleEditProductSubmit}
-              />
+            <div className="px-8 py-6">
+              {editingProduct.productType === "other" ? (
+                <OtherProductForm
+                  product={editingProduct}
+                  isEdit={true}
+                  onSuccess={handleEditProductSubmit}
+                />
+              ) : (
+                <SattuProductForm
+                  product={editingProduct}
+                  isEdit={true}
+                  onSuccess={handleEditProductSubmit}
+                />
+              )}
             </div>
           </div>
         </div>

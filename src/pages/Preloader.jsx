@@ -122,16 +122,7 @@ const PremiumPreloader = ({ onComplete }) => {
           </div>
 
           {/* INTERACTIVE KINETIC TEXT ENGINE (Replaces Numerical Counter) */}
-          <div className="h-4 overflow-hidden relative w-48 text-center pt-0.5">
-            <span className={`absolute inset-x-0 mx-auto text-[14px] font-sans font-bold uppercase tracking-[0.25em] text-[#6b4f3a]/50 transition-all duration-500 ease-out transform ${progress === 100 ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-              }`}>
-              Nourishing your body
-            </span>
-            <span className={`absolute inset-x-0 mx-auto text-[14px] font-sans font-bold uppercase tracking-[0.25em] text-[#976E2A] transition-all duration-500 ease-out transform ${progress === 100 ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-              }`}>
-              Ready for Vitality
-            </span>
-          </div>
+         
         </div>
 
       </div>

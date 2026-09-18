@@ -1,20 +1,31 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { uploadToCloudinary } from "../Admin";
-import { Plus, Trash2, Package, Layers, FileText, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Boxes, Layers, FileText, Image as ImageIcon } from "lucide-react";
 
-const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
+const OTHER_CATEGORIES = [
+  "Healthy Snacks",
+  "Spices & Herbs",
+  "Superfoods & Grains",
+  "Oils & Ghee",
+  "Pickles & Preserves",
+  "Beverages",
+  "Organic Staples",
+  "Other Food Items"
+];
+
+const OtherProductForm = ({ onSuccess, isEdit = false, product = null }) => {
   const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: {
       name: product?.name || "",
-      flavor: product?.flavor || "",
+      category: product?.category || "Healthy Snacks",
       description: product?.description || "",
       price: product?.price || 0,
       original_price: product?.original_price || 0,
       stock_count: product?.stock_count !== undefined ? product.stock_count : (product?.stock_status === "Out of Stock" ? 0 : 50),
       ingredients: product?.ingredients || "",
       nutritional_info: product?.nutritional_info || "",
-      net_quantity: product?.net_quantity || "500g",
+      net_quantity: product?.net_quantity || "250g",
       how_to_prepare: product?.how_to_prepare || "",
       rating: product?.rating || 4.5,
     },
@@ -32,35 +43,26 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
       : [
           {
             weight: product?.net_quantity || "250g",
-            price: product?.price || 149,
-            original_price: product?.original_price || 199,
+            price: product?.price || 199,
+            original_price: product?.original_price || 249,
             stock_count: 50,
           },
           {
             weight: "500g",
-            price: (product?.price || 149) * 1.8,
-            original_price: (product?.original_price || 199) * 1.8,
+            price: (product?.price || 199) * 1.8,
+            original_price: (product?.original_price || 249) * 1.8,
             stock_count: 30,
           },
         ]
   );
-
-  const flavors = [
-    "Classic Roasted",
-    "Elaichi",
-    "Rose",
-    "Dry Fruit",
-    "Chocolate",
-    "Namkeen Spicy",
-  ];
 
   const handleAddVariant = () => {
     setVariants([
       ...variants,
       {
         weight: "1kg",
-        price: 399,
-        original_price: 499,
+        price: 449,
+        original_price: 549,
         stock_count: 20,
       },
     ]);
@@ -113,8 +115,8 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
 
       const docData = {
         name: values.name,
-        flavor: values.flavor,
-        productType: "sattu",
+        category: values.category,
+        productType: "other",
         description: values.description,
         price: primaryVariant.price || Number(values.price) || 0,
         original_price: primaryVariant.original_price || Number(values.original_price) || 0,
@@ -147,9 +149,9 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
       {/* SECTION 1: BASIC INFO */}
       <div className="space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-[#E5DEC9]">
-          <Package className="text-[#6b4f3a]" size={18} />
+          <Boxes className="text-[#976E2A]" size={18} />
           <h3 className="text-xs font-poppins font-black uppercase tracking-widest text-[#2A1B12]">
-            1. Basic Product Identity
+            1. Organic Item Identity
           </h3>
         </div>
 
@@ -159,23 +161,22 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
               Product Name
             </label>
             <input
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-xs font-medium bg-[#FDFBF7]"
-              placeholder="e.g. Premium Elaichi Sattu Mix"
+              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] focus:ring-1 focus:ring-[#976E2A] outline-none transition-all text-xs font-medium bg-[#FDFBF7]"
+              placeholder="e.g. Organic Roasted Makhana"
               {...register("name", { required: true })}
             />
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
-              Flavor Category
+              Category
             </label>
             <select
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-xs font-medium bg-[#FDFBF7]"
-              {...register("flavor", { required: true })}
+              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] focus:ring-1 focus:ring-[#976E2A] outline-none transition-all text-xs font-medium bg-[#FDFBF7]"
+              {...register("category", { required: true })}
             >
-              <option value="">Select Flavor</option>
-              {flavors.map((flavor) => (
-                <option key={flavor} value={flavor}>
-                  {flavor}
+              {OTHER_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
@@ -187,8 +188,8 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
             Product Description
           </label>
           <textarea
-            className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-xs font-medium bg-[#FDFBF7] min-h-[80px]"
-            placeholder="Describe traditional roasting, nutritional benefits..."
+            className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] focus:ring-1 focus:ring-[#976E2A] outline-none transition-all text-xs font-medium bg-[#FDFBF7] min-h-[80px]"
+            placeholder="Detailed description, organic quality highlights..."
             rows={3}
             {...register("description")}
           />
@@ -207,7 +208,7 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
           <button
             type="button"
             onClick={handleAddVariant}
-            className="px-3 py-1.5 rounded-xl bg-[#6b4f3a]/10 text-[#6b4f3a] hover:bg-[#6b4f3a] hover:text-white text-xs font-bold transition-all flex items-center gap-1 border border-[#6b4f3a]/20"
+            className="px-3 py-1.5 rounded-xl bg-[#976E2A]/10 text-[#976E2A] hover:bg-[#976E2A] hover:text-white text-xs font-bold transition-all flex items-center gap-1 border border-[#976E2A]/20"
           >
             <Plus size={14} /> Add Quantity Tier
           </button>
@@ -239,7 +240,7 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   type="number"
                   value={v.price}
                   onChange={(e) => handleVariantChange(idx, "price", e.target.value)}
-                  placeholder="149"
+                  placeholder="199"
                   className="w-full px-3 py-2 rounded-xl border border-[#E5DEC9] text-xs font-bold bg-white"
                 />
               </div>
@@ -251,7 +252,7 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   type="number"
                   value={v.original_price}
                   onChange={(e) => handleVariantChange(idx, "original_price", e.target.value)}
-                  placeholder="199"
+                  placeholder="249"
                   className="w-full px-3 py-2 rounded-xl border border-[#E5DEC9] text-xs font-bold bg-white"
                 />
               </div>
@@ -287,9 +288,9 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
       {/* SECTION 3: SPECS & NUTRITION */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center gap-2 pb-2 border-b border-[#E5DEC9]">
-          <FileText className="text-[#6b4f3a]" size={18} />
+          <FileText className="text-[#976E2A]" size={18} />
           <h3 className="text-xs font-poppins font-black uppercase tracking-widest text-[#2A1B12]">
-            3. Ingredients & Preparation Specs
+            3. Composition & Usage Specs
           </h3>
         </div>
 
@@ -303,18 +304,18 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
               step="0.1"
               min="0"
               max="5"
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7]"
+              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] outline-none text-xs font-medium bg-[#FDFBF7]"
               placeholder="4.5"
               {...register("rating")}
             />
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
-              Ingredients
+              Ingredients / Composition
             </label>
             <input
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7]"
-              placeholder="e.g. Roasted Chana Gram, Barley, Elaichi..."
+              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] outline-none text-xs font-medium bg-[#FDFBF7]"
+              placeholder="e.g. 100% Organic Fox Nuts, Rock Salt..."
               {...register("ingredients")}
             />
           </div>
@@ -326,19 +327,19 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
               Nutritional Facts
             </label>
             <textarea
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7] min-h-[70px]"
-              placeholder="Per 100g: Protein 20g, Fiber 8g..."
+              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] outline-none text-xs font-medium bg-[#FDFBF7] min-h-[70px]"
+              placeholder="Per 100g: Protein 14g, Fiber 7g..."
               rows={2}
               {...register("nutritional_info")}
             />
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
-              How to Prepare
+              Serving / Usage Instructions
             </label>
             <textarea
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7] min-h-[70px]"
-              placeholder="Mix 2 tbsp in chilled water or milk..."
+              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#976E2A] outline-none text-xs font-medium bg-[#FDFBF7] min-h-[70px]"
+              placeholder="Ready to eat healthy tea-time snack..."
               rows={2}
               {...register("how_to_prepare")}
             />
@@ -358,7 +359,7 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
           type="file"
           multiple
           accept="image/*"
-          className="w-full px-4 py-3 rounded-xl border border-dashed border-[#6b4f3a] hover:border-[#2A1B12] transition-colors text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#6b4f3a]/10 file:text-[#6b4f3a] cursor-pointer bg-[#FDFBF7]"
+          className="w-full px-4 py-3 rounded-xl border border-dashed border-[#976E2A] hover:border-[#2A1B12] transition-colors text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#976E2A]/10 file:text-[#976E2A] cursor-pointer bg-[#FDFBF7]"
           {...register("images")}
         />
       </div>
@@ -375,13 +376,13 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
         <button
           type="submit"
           disabled={loading}
-          className="px-8 py-3 rounded-2xl bg-[#6b4f3a] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#6b4f3a]/20 hover:bg-[#2A1B12] transition-all disabled:opacity-50"
+          className="px-8 py-3 rounded-2xl bg-[#976E2A] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#976E2A]/20 hover:bg-[#2A1B12] transition-all disabled:opacity-50"
         >
-          {loading ? "Saving Details..." : isEdit ? "Update Sattu Product" : "Publish Sattu Product"}
+          {loading ? "Saving Details..." : isEdit ? "Update Other Product" : "Publish Other Product"}
         </button>
       </div>
     </form>
   );
 };
 
-export default SattuProductForm;
+export default OtherProductForm;

@@ -122,67 +122,82 @@ const Cart = () => {
                   {/* COMPACT ITEM ROW STACK */}
                   <motion.div layout className="space-y-4">
                     <AnimatePresence mode="popLayout">
-                      {cart.map((item, idx) => (
-                        <motion.div
-                          key={`${item.id}-${idx}`}
-                          layout
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, x: -30, opacity: 0 }}
-                          transition={{ duration: 0.5, ease: premiumEase }}
-                          className="group relative bg-[#FFFDF6] rounded-[20px] p-4 flex flex-col sm:flex-row items-center gap-6 border border-[#E3DBC5]/50 hover:border-[#976E2A]/40 transition-all duration-500 shadow-[0_4px_20px_rgba(32,59,35,0.01)] hover:shadow-[0_20px_40px_rgba(151,110,42,0.04)]"
-                        >
-                          {/* Fine Art Presentation Frame */}
-                          <Link to={`/product/${item.id}`} className="w-24 h-28 rounded-[14px] bg-[#FFFDF6] border border-[#E3DBC5]/40 p-2 shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.01)] group-hover:border-[#976E2A]/20 transition-all duration-500">
-                            <div className="w-full h-full overflow-hidden rounded-[10px] bg-[#FAF4E3]/60 flex items-center justify-center p-1 relative">
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-                              />
-                            </div>
-                          </Link>
-
-                          {/* Info Typography Matrix */}
-                          <div className="flex-1 text-center sm:text-left space-y-1">
-                            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#976E2A]">
-                              {item.flavor || "Classic"}
-                            </span>
-                            <h3 className="text-lg font-bold text-[#6b4f3a] tracking-tight group-hover:text-[#976E2A] transition-colors duration-300">
-                              {item.name}
-                            </h3>
-                            <p className="text-lg font-medium text-[#6b4f3a]/90 pt-1 font-sans">
-                              ₹{Number(item.price).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
-                            </p>
-                          </div>
-
-                          {/* Quantity Controls */}
-                          <div className="flex items-center bg-[#FAF4E3]/30 border border-[#E3DBC5]/40 rounded-xl p-1 gap-2">
-                             <button 
-                               onClick={() => updateQuantity(item.id, -1)}
-                               className="w-8 h-8 flex items-center justify-center text-[#6b4f3a]/60 hover:text-[#976E2A] transition-colors"
-                             >
-                               -
-                             </button>
-                             <span className="w-6 text-center text-[14px] font-bold font-sans text-[#6b4f3a]">{item.quantity || 1}</span>
-                             <button 
-                               onClick={() => updateQuantity(item.id, 1)}
-                               className="w-8 h-8 flex items-center justify-center text-[#6b4f3a]/60 hover:text-[#976E2A] transition-colors"
-                             >
-                               +
-                             </button>
-                          </div>
-
-                          {/* Minimalist Removal Node */}
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="sm:mr-2 p-3.5 rounded-xl bg-[#FAF4E3]/50 text-[#6b4f3a]/40 border border-[#E3DBC5]/30 hover:bg-red-50/60 hover:text-red-600 hover:border-red-100 transition-all duration-300 group/trash"
-                            aria-label="Remove item"
+                      {cart.map((item, idx) => {
+                        const maxStock = item.stock_count !== undefined ? Number(item.stock_count) : 50;
+                        const isMaxReached = (item.quantity || 1) >= maxStock;
+                        return (
+                          <motion.div
+                            key={`${item.id}-${idx}`}
+                            layout
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: -30, opacity: 0 }}
+                            transition={{ duration: 0.5, ease: premiumEase }}
+                            className="group relative bg-[#FFFDF6] rounded-[20px] p-4 flex flex-col sm:flex-row items-center gap-6 border border-[#E3DBC5]/50 hover:border-[#976E2A]/40 transition-all duration-500 shadow-[0_4px_20px_rgba(32,59,35,0.01)] hover:shadow-[0_20px_40px_rgba(151,110,42,0.04)]"
                           >
-                            <Trash2 size={15} strokeWidth={1.5} className="group-hover/trash:scale-105 transition-transform" />
-                          </button>
-                        </motion.div>
-                      ))}
+                            {/* Fine Art Presentation Frame */}
+                            <Link to={`/product/${item.id}`} className="w-24 h-28 rounded-[14px] bg-[#FFFDF6] border border-[#E3DBC5]/40 p-2 shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.01)] group-hover:border-[#976E2A]/20 transition-all duration-500">
+                              <div className="w-full h-full overflow-hidden rounded-[10px] bg-[#FAF4E3]/60 flex items-center justify-center p-1 relative">
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+                                />
+                              </div>
+                            </Link>
+
+                            {/* Info Typography Matrix */}
+                            <div className="flex-1 text-center sm:text-left space-y-1">
+                              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#976E2A]">
+                                {item.flavor || "Classic"} {item.weight ? `• ${item.weight}` : ""}
+                              </span>
+                              <h3 className="text-lg font-bold text-[#6b4f3a] tracking-tight group-hover:text-[#976E2A] transition-colors duration-300">
+                                {item.name}
+                              </h3>
+                              <p className="text-lg font-medium text-[#6b4f3a]/90 pt-1 font-sans">
+                                ₹{Number(item.price).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
+                              </p>
+                              {isMaxReached && (
+                                <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md inline-block mt-1">
+                                  That's all stock left ({maxStock} {maxStock === 1 ? 'unit' : 'units'})
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Quantity Controls */}
+                            <div className="flex items-center bg-[#FAF4E3]/30 border border-[#E3DBC5]/40 rounded-xl p-1 gap-2">
+                               <button 
+                                 onClick={() => updateQuantity(item.id, -1)}
+                                 className="w-8 h-8 flex items-center justify-center text-[#6b4f3a]/60 hover:text-[#976E2A] transition-colors"
+                               >
+                                 -
+                               </button>
+                               <span className="w-6 text-center text-[14px] font-bold font-sans text-[#6b4f3a]">{item.quantity || 1}</span>
+                               <button 
+                                 onClick={() => updateQuantity(item.id, 1)}
+                                 disabled={isMaxReached}
+                                 title={isMaxReached ? "That's all stock left" : "Increase quantity"}
+                                 className={`w-8 h-8 flex items-center justify-center transition-colors ${
+                                   isMaxReached 
+                                     ? "text-gray-300 cursor-not-allowed opacity-40" 
+                                     : "text-[#6b4f3a]/60 hover:text-[#976E2A]"
+                                 }`}
+                               >
+                                 +
+                               </button>
+                            </div>
+
+                            {/* Minimalist Removal Node */}
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="sm:mr-2 p-3.5 rounded-xl bg-[#FAF4E3]/50 text-[#6b4f3a]/40 border border-[#E3DBC5]/30 hover:bg-red-50/60 hover:text-red-600 hover:border-red-100 transition-all duration-300 group/trash"
+                              aria-label="Remove item"
+                            >
+                              <Trash2 size={15} strokeWidth={1.5} className="group-hover/trash:scale-105 transition-transform" />
+                            </button>
+                          </motion.div>
+                        );
+                      })}
                     </AnimatePresence>
                   </motion.div>
                 </div>
