@@ -1,11 +1,17 @@
+import { useState, useEffect } from 'react';
 import { Star } from "lucide-react";
 import { motion } from 'framer-motion';
 import SectionHeader from './SectionHeader';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import { db } from '../Firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+
+const DEFAULT_MOBILE_BG = "https://res.cloudinary.com/dcjn4y284/image/upload/v1789828465/Vedamya_Foods.jpg_1_polacf.jpg";
+const DEFAULT_DESKTOP_BG = "https://res.cloudinary.com/duzwys877/image/upload/v1782294871/b2_o8oxcn.png";
 
 const testimonials = [
   {
@@ -21,20 +27,30 @@ const testimonials = [
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&h=200&auto=format&fit=crop"
   },
   {
-    name: "Karan Patel",
-    role: "Fitness Enthusiast",
-    text: "As a fitness professional, I value raw potency. This is the cleanest protein source I've ever integrated into my diet.",
+    name: "Vikram Singh",
+    role: "Verified Buyer",
+    text: "Remarkable texture and aroma. Reminds me of traditional home-prepared sattu from my childhood.",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&auto=format&fit=crop"
-  },
-  {
-    name: "Meera Iyer",
-    role: "Health Coach",
-    text: "Finally, a brand that respects Vedic production methods. The stone-ground quality is evident in every single sip.",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&h=200&auto=format&fit=crop"
   }
 ];
 
 const Testimonials = () => {
+  const [mobileBg, setMobileBg] = useState(DEFAULT_MOBILE_BG);
+  const [desktopBg, setDesktopBg] = useState(DEFAULT_DESKTOP_BG);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "homepage"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.testimonialsMobileBg) setMobileBg(data.testimonialsMobileBg);
+        if (data.testimonialsDesktopBg) setDesktopBg(data.testimonialsDesktopBg);
+      }
+    }, (err) => {
+      console.log("Using default testimonials bg images");
+    });
+    return () => unsub();
+  }, []);
+
   return (
     <section 
       className="py-24 relative overflow-hidden bg-[#FDFBF7]"
@@ -44,7 +60,7 @@ const Testimonials = () => {
       <div 
         className="absolute inset-0 opacity-[0.9] pointer-events-none block md:hidden"
         style={{ 
-          backgroundImage: "url('https://res.cloudinary.com/duzwys877/image/upload/v1782295023/WhatsApp_Image_2026-06-24_at_15.26.25_wak18c.jpg')",  // ← Replace with your mobile image path
+          backgroundImage: `url('${mobileBg}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           filter: 'sepia(30%) brightness(1.1)'
@@ -55,10 +71,9 @@ const Testimonials = () => {
       <div 
         className="absolute inset-0 opacity-[0.9] pointer-events-none hidden md:block"
         style={{ 
-          backgroundImage: "url('https://res.cloudinary.com/duzwys877/image/upload/v1782294871/b2_o8oxcn.png')", // ← Replace with your desktop image path
+          backgroundImage: `url('${desktopBg}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'sepia(30%) brightness(1.1)'
         }} 
       />
 

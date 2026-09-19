@@ -123,10 +123,10 @@ const HowToMake = () => {
               640: { slidesPerView: 2 },
               768: { slidesPerView: 2.5 },
             }}
-            className="pb-16 premium-htw-swiper"
+            className="pb-20 premium-htw-swiper"
           >
             {steps.map((step) => (
-              <SwiperSlide key={step.number} className="h-full">
+              <SwiperSlide key={step.number} className="h-auto">
                 <div className="group flex flex-col items-center w-full text-center relative px-2">
 
                   {/* Matching Mobile Architectural Frame with Premium Adjustments */}
@@ -160,21 +160,26 @@ const HowToMake = () => {
       {/* Reconfigured Minimal Slider Pagination Architecture */}
       <style dangerouslySetInnerHTML={{
         __html: `
+        .premium-htw-swiper .swiper-slide {
+          height: auto !important;
+          padding-bottom: 36px !important;
+        }
         .premium-htw-swiper .swiper-pagination-bullet {
           background: #6b4f3a !important;
-          opacity: 0.15;
-          width: 6px;
-          height: 6px;
+          opacity: 0.2;
+          width: 8px;
+          height: 8px;
           transition: all 0.3s ease;
         }
         .premium-htw-swiper .swiper-pagination-bullet-active {
           opacity: 1;
           background: #976E2A !important;
-          width: 20px;
+          width: 22px;
           border-radius: 4px;
         }
         .premium-htw-swiper .swiper-pagination {
           bottom: 4px !important;
+          position: absolute !important;
         }
       `}} />
 

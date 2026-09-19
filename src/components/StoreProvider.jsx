@@ -12,6 +12,24 @@ export const StoreProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [addedModalItem, setAddedModalItem] = useState(null);
+
+  const triggerAddToCartPopup = (product, selectedVariant = null, quantity = 1) => {
+    setAddedModalItem({
+      product,
+      variant: selectedVariant || {
+        weight: product.net_quantity || product.weight || "500g",
+        price: product.price || 0,
+        original_price: product.original_price || product.mrp || Math.round((product.price || 0) * 1.25)
+      },
+      quantity,
+      timestamp: Date.now()
+    });
+  };
+
+  const hideAddToCartPopup = () => {
+    setAddedModalItem(null);
+  };
 
   // --- SYNC GUEST DATA ON LOGIN ---
   useEffect(() => {
@@ -70,7 +88,7 @@ export const StoreProvider = ({ children }) => {
     };
   }, [user]);
 
-  const addToCart = async (product, quantity = 1, selectedVariant = null) => {
+  const addToCart = async (product, quantity = 1, selectedVariant = null, showPopup = true) => {
     const variantWeight = selectedVariant?.weight || product.net_quantity || product.weight || "";
     const variantPrice = selectedVariant?.price || product.price;
     const maxStock = selectedVariant?.stock_count !== undefined 
@@ -140,6 +158,11 @@ export const StoreProvider = ({ children }) => {
       localStorage.setItem("guest_cart", JSON.stringify(updated));
       setCart(updated);
     }
+
+    if (showPopup) {
+      triggerAddToCartPopup(product, selectedVariant, quantity);
+    }
+
     return true;
   };
 
@@ -229,7 +252,7 @@ export const StoreProvider = ({ children }) => {
   };
 
   return (
-    <StoreContext.Provider value={{ cart, wishlist, loading, addToCart, removeFromCart, updateQuantity, clearCart, addToWishlist, removeFromWishlist }}>
+    <StoreContext.Provider value={{ cart, wishlist, loading, addToCart, removeFromCart, updateQuantity, clearCart, addToWishlist, removeFromWishlist, addedModalItem, triggerAddToCartPopup, hideAddToCartPopup }}>
       {children}
     </StoreContext.Provider>
   );

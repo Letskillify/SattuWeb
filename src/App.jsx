@@ -28,6 +28,8 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminSignup from "./pages/Admin/AdminSignup";
 
+import AddToCartModal from "./components/Sattu/AddToCartModal";
+
 const AppRoutes = () => {
   const location = useLocation();
   const hideChrome =
@@ -62,6 +64,7 @@ const AppRoutes = () => {
           <Route path="/product/:id/quickview" element={<QuickView />} />
         </Routes>
       </div>
+      <AddToCartModal />
       {!hideChrome && <Footer />}
     </>
   );

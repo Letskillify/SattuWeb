@@ -69,7 +69,6 @@ const ProductCard = ({ product, idx, triggerToast }) => {
     if (type === 'cart') {
       if (isOutOfStock || isMaxInCart) return;
       await addToCart(product, 1, currentVariant);
-      triggerToast(`Added "${product.name} (${currentVariant.weight})" to cart!`);
     } else {
       if (isWishlisted) {
         await removeFromWishlist(product.id);
@@ -271,7 +270,7 @@ const BestsellerProducts = () => {
         <div className="relative mb-10">
           <SectionHeader
             title="Our Bestsellers"
-            subtitle="Shop The Collection"
+            subtitle="Find Your Perfect Blend"
           />
           <div className="absolute bottom-2 right-0 hidden md:block">
             <Link
@@ -304,7 +303,7 @@ const BestsellerProducts = () => {
               640: { slidesPerView: 2.2 },
               868: { slidesPerView: 2.6 },
             }}
-            className="pb-14 heritage-swiper"
+            className="pb-20 heritage-swiper px-2"
           >
             {products.map((product, idx) => (
               <SwiperSlide key={product.id} className="h-auto">
@@ -340,21 +339,26 @@ const BestsellerProducts = () => {
 
       <style dangerouslySetInnerHTML={{
         __html: `
+        .heritage-swiper .swiper-slide {
+          height: auto !important;
+          padding-bottom: 36px !important;
+        }
         .heritage-swiper .swiper-pagination-bullet {
           background: #362214 !important;
-          opacity: 0.2;
-          width: 7px;
-          height: 7px;
+          opacity: 0.25;
+          width: 8px;
+          height: 8px;
           transition: all 0.3s ease;
         }
         .heritage-swiper .swiper-pagination-bullet-active {
           opacity: 1;
           background: #5C0612 !important;
-          width: 20px;
+          width: 22px;
           border-radius: 4px;
         }
         .heritage-swiper .swiper-pagination {
-          bottom: 0px !important;
+          bottom: 6px !important;
+          position: absolute !important;
         }
       `}} />
     </section>

@@ -10,7 +10,8 @@ import {
   ExternalLink,
   ShieldCheck,
   ChevronRight,
-  LogOut
+  LogOut,
+  LayoutTemplate
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../components/useAuth';
@@ -20,6 +21,7 @@ const navGroups = [
     title: "Overview",
     items: [
       { name: "Dashboard", icon: LayoutDashboard, badge: null },
+      { name: "Homepage Manager", icon: LayoutTemplate, badge: "Live" },
     ]
   },
   {
@@ -49,26 +51,28 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
   };
 
   return (
-    <aside className="w-72 bg-[#2A1B12] text-[#F3EFE6] flex flex-col min-h-screen border-r border-[#3E2B1E] shadow-2xl shrink-0 z-30 select-none">
+    <aside className="w-72 bg-[#1A110B] text-[#F3EFE6] flex flex-col min-h-screen border-r border-[#332217] shadow-2xl shrink-0 z-30 select-none">
       
       {/* BRAND HEADER */}
-      <div className="px-6 py-6 border-b border-[#3E2B1E] bg-[#23150E]/80 backdrop-blur-md">
+      <div className="px-6 py-6 border-b border-[#332217] bg-[#140D08]/90 backdrop-blur-md">
         <Link to="/" className="flex items-center gap-3.5 group">
           <div className="relative">
-            <img
-              src="https://res.cloudinary.com/duzwys877/image/upload/v1782295170/logo_rwarlx.png"
-              alt="Vedamya Logo"
-              className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-[#D9A036] text-[#2A1B12] flex items-center justify-center text-[9px] font-extrabold shadow-sm">
-              <Leaf size={10} strokeWidth={3} />
+            <div className="w-11 h-11 rounded-2xl bg-[#2A1B12] border border-[#3E2B1E] flex items-center justify-center p-1 shadow-md group-hover:border-[#D9A036] transition-colors">
+              <img
+                src="https://res.cloudinary.com/duzwys877/image/upload/v1782295170/logo_rwarlx.png"
+                alt="Vedamya Logo"
+                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+            <div className="absolute -bottom-1 -right-1 h-4 shadow-md w-4 rounded-full bg-[#D9A036] text-[#1A1009] flex items-center justify-center text-[10px] font-black">
+              <Leaf size={11} strokeWidth={3} />
             </div>
           </div>
           <div>
-            <h2 className="text-lg font-poppins font-black text-white tracking-tight leading-none uppercase">
+            <h2 className="text-xl font-poppins font-black text-white tracking-tight leading-none uppercase">
               Vedamya
             </h2>
-            <p className="text-[11px] font-poppins font-bold uppercase tracking-[0.25em] text-[#D9A036] mt-1">
+            <p className="text-xs font-poppins font-extrabold uppercase tracking-[0.2em] text-[#D9A036] mt-1">
               Admin Console
             </p>
           </div>
@@ -76,14 +80,14 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
       </div>
 
       {/* NAVIGATION GROUPS */}
-      <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto scrollbar-none">
+      <nav className="flex-1 px-4 py-6 space-y-7 overflow-y-auto scrollbar-none">
         {navGroups.map((group) => (
-          <div key={group.title} className="space-y-1.5">
-            <p className="px-4 text-[10px] font-poppins font-black uppercase tracking-[0.3em] text-[#A69280]/70">
+          <div key={group.title} className="space-y-2">
+            <p className="px-4 text-xs font-poppins font-black uppercase tracking-[0.25em] text-[#A69280]/80">
               {group.title}
             </p>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {group.items.map((item) => {
                 const isActive =
                   item.name === activeItem ||
@@ -95,18 +99,18 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
                     key={item.name}
                     type="button"
                     onClick={() => setActiveItem(item.name)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 group ${
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 group ${
                       isActive
-                        ? "bg-[#D9A036] text-[#1A1009] shadow-lg shadow-[#D9A036]/20 font-extrabold translate-x-1"
-                        : "text-[#D5C9BD] hover:bg-[#3E2B1E]/60 hover:text-white"
+                        ? "bg-gradient-to-r from-[#D9A036] to-[#C68A27] text-[#1A1009] shadow-lg shadow-[#D9A036]/25 font-black translate-x-1"
+                        : "text-[#D5C9BD] hover:bg-[#2A1B12]/80 hover:text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <Icon
-                        size={18}
-                        strokeWidth={isActive ? 2.5 : 1.8}
+                        size={20}
+                        strokeWidth={isActive ? 2.5 : 2}
                         className={`transition-colors ${
-                          isActive ? "text-[#1A1009]" : "text-[#D9A036]/70 group-hover:text-[#D9A036]"
+                          isActive ? "text-[#1A1009]" : "text-[#D9A036]/80 group-hover:text-[#D9A036]"
                         }`}
                       />
                       <span>{item.name}</span>
@@ -114,12 +118,12 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
 
                     <div className="flex items-center gap-2">
                       {item.badge && !isActive && (
-                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#3E2B1E] text-[#D9A036] border border-[#523A2A]">
+                        <span className="text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#2A1B12] text-[#D9A036] border border-[#3E2B1E]">
                           {item.badge}
                         </span>
                       )}
                       {isActive && (
-                        <ChevronRight size={14} className="text-[#1A1009]" />
+                        <ChevronRight size={16} className="text-[#1A1009]" strokeWidth={2.5} />
                       )}
                     </div>
                   </button>
@@ -130,34 +134,34 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
         ))}
 
         {/* LIVE STORE LINK */}
-        <div className="pt-4 border-t border-[#3E2B1E]">
+        <div className="pt-5 border-t border-[#332217]">
           <Link
             to="/products"
             target="_blank"
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-[#352317] hover:bg-[#452F20] text-[#D9A036] text-xs font-bold transition-all border border-[#523A2A]/50 group"
+            className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl bg-[#2A1B12] hover:bg-[#382418] text-[#D9A036] text-sm font-bold transition-all border border-[#3E2B1E] group shadow-sm"
           >
             <span className="flex items-center gap-2.5">
-              <ExternalLink size={15} />
+              <ExternalLink size={17} />
               <span>View Web Store</span>
             </span>
-            <ChevronRight size={14} className="opacity-50 group-hover:translate-x-1 transition-transform" />
+            <ChevronRight size={16} className="opacity-60 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </nav>
 
       {/* ADMIN PROFILE CARD & LOGOUT */}
-      <div className="p-4 border-t border-[#3E2B1E] bg-[#23150E]">
-        <div className="flex items-center justify-between p-3 rounded-xl bg-[#2A1B12] border border-[#3E2B1E]">
+      <div className="p-4 border-t border-[#332217] bg-[#140D08]">
+        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1A110B] border border-[#332217]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#D9A036]/20 border border-[#D9A036]/40 text-[#D9A036] flex items-center justify-center font-bold text-xs">
-              <ShieldCheck size={18} />
+            <div className="w-10 h-10 rounded-xl bg-[#D9A036]/20 border border-[#D9A036]/40 text-[#D9A036] flex items-center justify-center font-bold text-sm shadow-sm">
+              <ShieldCheck size={20} />
             </div>
             <div className="overflow-hidden">
-              <p className="text-xs font-bold text-white truncate">
+              <p className="text-sm font-bold text-white truncate">
                 {user?.email?.split("@")[0] || "Manager"}
               </p>
-              <p className="text-[10px] text-[#A69280] flex items-center gap-1 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <p className="text-xs text-[#A69280] flex items-center gap-1.5 font-semibold mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Super Admin
               </p>
             </div>
@@ -165,10 +169,10 @@ const AdminSidebar = ({ activeItem, setActiveItem }) => {
 
           <button
             onClick={handleLogout}
-            className="p-2 text-[#A69280] hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+            className="p-2.5 text-[#A69280] hover:text-red-400 hover:bg-red-950/30 rounded-xl transition-colors"
             title="Sign Out"
           >
-            <LogOut size={16} />
+            <LogOut size={18} />
           </button>
         </div>
       </div>

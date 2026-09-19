@@ -142,7 +142,6 @@ const ProductDetail = () => {
       }
       const actualQtyToAdd = Math.min(quantity, maxAvailableToAdd);
       await addToCart(product, actualQtyToAdd, currentVariant);
-      triggerToast(`${actualQtyToAdd} ${actualQtyToAdd > 1 ? 'items' : 'item'} (${currentVariant.weight}) added to your cart!`);
     } else {
       if (isWishlisted) {
         await removeFromWishlist(product.id);

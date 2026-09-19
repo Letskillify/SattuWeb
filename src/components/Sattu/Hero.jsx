@@ -1,17 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
+import { db } from "../Firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
+const DEFAULT_VIDEO = "https://res.cloudinary.com/dcjn4y284/video/upload/v1789826708/95d3be6fd9d84a7ea956b74d39f59fa1_n0gsf0.mp4";
+
 const Hero = () => {
-  const [isVideoLoaded, setIsVideoLoaded] = React.useState(false);
-  const videos = [
-    "https://res.cloudinary.com/duzwys877/video/upload/v1782296415/WhatsApp_Video_2026-06-24_at_14.48.34_bch8zp.mp4",
-  ];
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [heroVideoUrl, setHeroVideoUrl] = useState(DEFAULT_VIDEO);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, "settings", "homepage"), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.heroVideoUrl) {
+          setHeroVideoUrl(data.heroVideoUrl);
+        }
+      }
+    }, (err) => {
+      console.log("Using default hero video setting");
+    });
+    return () => unsub();
+  }, []);
+
+  const videos = [heroVideoUrl];
 
   return (
     <section className="relative h-[65vh] sm:h-[80vh] lg:h-[calc(100vh-120px)] w-full overflow-hidden bg-[#fff] mt-[80px] md:mt-28 ">

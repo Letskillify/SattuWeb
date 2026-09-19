@@ -23,6 +23,7 @@ import UsersTable from "./components/UsersTable";
 import FlavorsOverview from "./components/FlavorsOverview";
 import SattuProductForm from "./components/ProductForm";
 import OtherProductForm from "./components/OtherProductForm";
+import HomepageManager from "./components/HomepageManager";
 import { X, Package, Boxes } from "lucide-react";
 import { useAuth } from "../../components/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -173,6 +174,9 @@ const Admin = () => {
           </>
         );
 
+      case "Homepage Manager":
+        return <HomepageManager />;
+
       default:
         return (
           <>
@@ -202,7 +206,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#F7F4EE] text-[#2A1B12] font-sans selection:bg-[#D9A036] selection:text-white">
+    <div className="min-h-screen flex bg-[#FAF7F2] text-[#2A1B12] font-sans selection:bg-[#D9A036] selection:text-white">
       <AdminSidebar activeItem={activeItem} setActiveItem={setActiveItem} />
 
       <main className="flex-1 px-6 py-8 md:px-10 lg:px-12 overflow-y-auto">
@@ -219,24 +223,24 @@ const Admin = () => {
 
       {/* Add Sattu Product Modal */}
       {isSattuModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1B12]/70 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#140D08]/75 backdrop-blur-md p-4">
           <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5DEC9]">
             <div className="px-8 py-6 border-b border-[#E5DEC9] flex items-center justify-between sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md z-10">
               <div>
-                <h2 className="text-xl font-poppins font-black text-[#2A1B12] flex items-center gap-2">
-                  <Package className="text-[#6b4f3a]" size={22} />
+                <h2 className="text-xl sm:text-2xl font-poppins font-black text-[#2A1B12] flex items-center gap-2.5">
+                  <Package className="text-[#6b4f3a]" size={24} />
                   Add New Sattu Product
                 </h2>
-                <p className="text-xs text-[#7A6E63] font-medium mt-1">
+                <p className="text-xs sm:text-sm text-[#7A6E63] font-semibold mt-1">
                   Configure flavor, description, and numeric stock weight variants
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSattuModalOpen(false)}
-                className="p-2.5 hover:bg-[#E5DEC9] rounded-xl transition-colors text-[#7A6E63] hover:text-[#2A1B12]"
+                className="p-2.5 hover:bg-[#E5DEC9] rounded-2xl transition-colors text-[#7A6E63] hover:text-[#2A1B12] cursor-pointer"
               >
-                <X size={20} />
+                <X size={22} />
               </button>
             </div>
             <div className="px-8 py-6">
@@ -248,24 +252,24 @@ const Admin = () => {
 
       {/* Add Other Product Modal */}
       {isOtherModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1B12]/70 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#140D08]/75 backdrop-blur-md p-4">
           <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5DEC9]">
             <div className="px-8 py-6 border-b border-[#E5DEC9] flex items-center justify-between sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md z-10">
               <div>
-                <h2 className="text-xl font-poppins font-black text-[#2A1B12] flex items-center gap-2">
-                  <Boxes className="text-[#976E2A]" size={22} />
+                <h2 className="text-xl sm:text-2xl font-poppins font-black text-[#2A1B12] flex items-center gap-2.5">
+                  <Boxes className="text-[#976E2A]" size={24} />
                   Add New Other Organic Product
                 </h2>
-                <p className="text-xs text-[#7A6E63] font-medium mt-1">
+                <p className="text-xs sm:text-sm text-[#7A6E63] font-semibold mt-1">
                   Add snacks, spices, grains, oils, or organic food products
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOtherModalOpen(false)}
-                className="p-2.5 hover:bg-[#E5DEC9] rounded-xl transition-colors text-[#7A6E63] hover:text-[#2A1B12]"
+                className="p-2.5 hover:bg-[#E5DEC9] rounded-2xl transition-colors text-[#7A6E63] hover:text-[#2A1B12] cursor-pointer"
               >
-                <X size={20} />
+                <X size={22} />
               </button>
             </div>
             <div className="px-8 py-6">
@@ -277,23 +281,23 @@ const Admin = () => {
 
       {/* Edit Product Modal */}
       {isEditModalOpen && editingProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1B12]/70 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#140D08]/75 backdrop-blur-md p-4">
           <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-[#E5DEC9]">
             <div className="px-8 py-6 border-b border-[#E5DEC9] flex items-center justify-between sticky top-0 bg-[#FDFBF7]/95 backdrop-blur-md z-10">
               <div>
-                <h2 className="text-xl font-poppins font-black text-[#2A1B12]">
+                <h2 className="text-xl sm:text-2xl font-poppins font-black text-[#2A1B12]">
                   Edit {editingProduct.productType === "other" ? "Other Product" : "Sattu Product"}
                 </h2>
-                <p className="text-xs text-[#7A6E63] font-medium mt-1">
+                <p className="text-xs sm:text-sm text-[#7A6E63] font-semibold mt-1">
                   Update details & quantity stock tiers for {editingProduct.name}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-2.5 hover:bg-[#E5DEC9] rounded-xl transition-colors text-[#7A6E63] hover:text-[#2A1B12]"
+                className="p-2.5 hover:bg-[#E5DEC9] rounded-2xl transition-colors text-[#7A6E63] hover:text-[#2A1B12] cursor-pointer"
               >
-                <X size={20} />
+                <X size={22} />
               </button>
             </div>
             <div className="px-8 py-6">

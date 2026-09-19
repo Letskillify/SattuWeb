@@ -63,7 +63,6 @@ const ProductCard = ({ product, idx, triggerToast }) => {
     if (type === 'cart') {
       if (isOutOfStock || isMaxInCart) return;
       await addToCart(product, 1, currentVariant);
-      triggerToast(`Added "${product.name} (${currentVariant.weight})" to cart!`);
     } else {
       if (isWishlisted) {
         await removeFromWishlist(product.id);

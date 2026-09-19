@@ -10,7 +10,11 @@ import {
   Sparkles, 
   ChevronRight, 
   Gift, 
-  FileText 
+  Plus, 
+  Minus, 
+  Lock, 
+  CheckCircle2, 
+  Leaf 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PageHeader from "../components/Sattu/PageHeader";
@@ -22,12 +26,12 @@ const Cart = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  // State for optional luxury gift note interaction
+  // State for optional gift note interaction
   const [isGiftNoteOpen, setIsGiftNoteOpen] = useState(false);
   const [giftNote, setGiftNote] = useState("");
 
   const total = cart.reduce((sum, item) => sum + ((Number(item.price) || 0) * (item.quantity || 1)), 0);
-  const premiumEase = [0.16, 1, 0.3, 1]; // Ultra smooth luxury cubic bezier
+  const premiumEase = [0.16, 1, 0.3, 1];
 
   const handleCheckout = () => {
     if (!user) {
@@ -37,23 +41,17 @@ const Cart = () => {
     }
   };
 
-  // --- EDITORIAL MINIMALIST LOADING STATE ---
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF4E3] flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/p6-grain.png')]" />
-        <div className="relative flex flex-col items-center gap-6">
-          <motion.div 
-            animate={{ rotation: 360 }}
-            transition={{ repeat: Infinity, duration: 1.8, ease: "linear" }}
-            className="w-16 h-16 border-t-2 border-[#976E2A] border-r-2 border-r-transparent rounded-full"
-          />
+      <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="relative flex flex-col items-center gap-4">
+          <div className="relative w-14 h-14">
+            <div className="absolute inset-0 border-4 border-[#6b4f3a]/20 rounded-full" />
+            <div className="absolute inset-0 border-4 border-t-[#D9A036] rounded-full animate-spin" />
+          </div>
           <div className="text-center space-y-1">
-            <p className="text-[11px] font-poppins font-bold uppercase tracking-[0.4em] text-[#976E2A]">
-              Loading Cart
-            </p>
-            <p className="text-[13px] font-serif italic text-[#6b4f3a]/60">
-              Fetching your items...
+            <p className="text-sm font-black uppercase tracking-widest text-[#2A1B12]">
+              Loading Your Cart...
             </p>
           </div>
         </div>
@@ -62,17 +60,10 @@ const Cart = () => {
   }
 
   return (
-    <div
-      className="min-h-screen relative bg-cover bg-center text-[#6b4f3a] selection:bg-[#976E2A] selection:text-[#FFFDF6] font-poppins"
-      style={{ backgroundImage: "url('/img/b3.png')" }}
-    >
-      {/* Premium Multi-layered Tonal Overlays */}
-      <div className="absolute inset-0 bg-[#FAF4E3]/90 pointer-events-none mix-blend-color-burn" />
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/p6-grain.png')]" />
-
+    <div className="min-h-screen relative bg-[#FAF7F2] text-[#2A1B12] selection:bg-[#D9A036] selection:text-[#2A1B12] font-poppins pb-24">
       <PageHeader
-        title="Your Cart"
-        subtitle="Manage Selections"
+        title="Shopping Cart"
+        subtitle="Review Your Selections"
         breadcrumbItems={[
           { label: "Home", path: "/" },
           { label: "Shop", path: "/shop" },
@@ -80,120 +71,153 @@ const Cart = () => {
         ]}
       />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 
-          {/* MAIN CART ARCHIVE AREA */}
-          <div className="lg:col-span-8 w-full">
+          {/* MAIN CART ITEMS LIST */}
+          <div className="lg:col-span-8 w-full space-y-6">
             <AnimatePresence mode="popLayout">
               {cart.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.6, ease: premiumEase }}
-                  className="bg-[#FFFDF6] border border-[#E3DBC5]/60 rounded-[24px] p-16 text-center shadow-[0_20px_50px_rgba(32,59,35,0.02)] max-w-xl mx-auto flex flex-col items-center"
+                  transition={{ duration: 0.5, ease: premiumEase }}
+                  className="bg-white border-2 border-[#6b4f3a]/15 rounded-3xl p-10 sm:p-16 text-center shadow-xl shadow-[#2A1B12]/5 max-w-xl mx-auto flex flex-col items-center"
                 >
-                  <div className="w-16 h-16 rounded-full bg-[#FAF4E3] border border-[#E3DBC5]/50 flex items-center justify-center text-[#976E2A] mb-6">
-                    <ShoppingBag size={22} strokeWidth={1.2} />
+                  <div className="w-20 h-20 rounded-full bg-[#FAF7F2] border-2 border-[#D9A036]/40 flex items-center justify-center text-[#6b4f3a] mb-6 shadow-md">
+                    <ShoppingBag size={36} strokeWidth={1.8} className="text-[#D9A036]" />
                   </div>
-                  <h3 className="text-2xl font-serif italic text-[#6b4f3a] mb-3">
-                    Your cart is empty
+                  <h3 className="text-2xl sm:text-3xl font-black text-[#2A1B12] uppercase tracking-tight mb-3">
+                    Your Cart is Empty
                   </h3>
-                  <p className="text-[13px] text-[#6b4f3a]/60 italic max-w-xs mb-8 leading-relaxed">
-                    Looks like you haven't added anything to your cart yet.
+                  <p className="text-sm text-[#6b4f3a] font-medium max-w-xs mb-8 leading-relaxed">
+                    You haven't added any products to your cart yet. Explore our organic sattu blends and healthy staples.
                   </p>
                   <Link
                     to="/shop"
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-[#6b4f3a] text-[#FFFDF6] font-bold text-[12px] uppercase tracking-[0.3em] rounded-lg hover:bg-[#976E2A] transition-all duration-300 shadow-sm group"
+                    className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#6b4f3a] to-[#2A1B12] text-white font-black text-xs sm:text-sm uppercase tracking-widest rounded-2xl hover:shadow-xl hover:scale-105 transition-all duration-300 shadow-md border border-[#D9A036]/40 group"
                   >
-                    Go Shopping
-                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                    <span>Explore Products</span>
+                    <ArrowRight size={16} className="text-[#D9A036] group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </motion.div>
               ) : (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between border-b border-[#E3DBC5]/40 pb-3 px-1">
-                    <h2 className="text-[12px] font-bold uppercase tracking-[0.3em] text-[#976E2A]">
-                      {cart.length} {cart.length === 1 ? "Item" : "Items"} in your cart
+                  {/* Cart Header Unit */}
+                  <div className="flex items-center justify-between border-b-2 border-[#6b4f3a]/15 pb-4 px-1">
+                    <h2 className="text-sm sm:text-base font-black uppercase tracking-wider text-[#2A1B12] flex items-center gap-2">
+                      <ShoppingBag className="w-5 h-5 text-[#D9A036]" />
+                      <span>Your Cart Items ({cart.length})</span>
                     </h2>
+                    <Link to="/shop" className="text-xs font-black uppercase text-[#6b4f3a] hover:text-[#D9A036] hover:underline flex items-center gap-1">
+                      <span>Add More Items</span>
+                      <ChevronRight size={14} />
+                    </Link>
                   </div>
 
-                  {/* COMPACT ITEM ROW STACK */}
+                  {/* CART ITEMS STACK */}
                   <motion.div layout className="space-y-4">
                     <AnimatePresence mode="popLayout">
                       {cart.map((item, idx) => {
                         const maxStock = item.stock_count !== undefined ? Number(item.stock_count) : 50;
                         const isMaxReached = (item.quantity || 1) >= maxStock;
+                        const itemPrice = Number(item.price) || 0;
+                        const itemTotal = itemPrice * (item.quantity || 1);
+
                         return (
                           <motion.div
                             key={`${item.id}-${idx}`}
                             layout
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, x: -30, opacity: 0 }}
-                            transition={{ duration: 0.5, ease: premiumEase }}
-                            className="group relative bg-[#FFFDF6] rounded-[20px] p-4 flex flex-col sm:flex-row items-center gap-6 border border-[#E3DBC5]/50 hover:border-[#976E2A]/40 transition-all duration-500 shadow-[0_4px_20px_rgba(32,59,35,0.01)] hover:shadow-[0_20px_40px_rgba(151,110,42,0.04)]"
+                            exit={{ opacity: 0, x: -30 }}
+                            transition={{ duration: 0.4, ease: premiumEase }}
+                            className="group relative bg-white rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-center gap-5 sm:gap-6 border-2 border-[#6b4f3a]/15 hover:border-[#D9A036]/50 transition-all duration-300 shadow-lg shadow-[#2A1B12]/5"
                           >
-                            {/* Fine Art Presentation Frame */}
-                            <Link to={`/product/${item.id}`} className="w-24 h-28 rounded-[14px] bg-[#FFFDF6] border border-[#E3DBC5]/40 p-2 shrink-0 shadow-[inset_0_2px_8px_rgba(0,0,0,0.01)] group-hover:border-[#976E2A]/20 transition-all duration-500">
-                              <div className="w-full h-full overflow-hidden rounded-[10px] bg-[#FAF4E3]/60 flex items-center justify-center p-1 relative">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-full h-full object-contain filter drop-shadow-sm transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-                                />
-                              </div>
+                            {/* Product Thumbnail Frame */}
+                            <Link 
+                              to={`/product/${item.productId || item.id}`} 
+                              className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#FAF7F2] border border-[#6b4f3a]/15 p-2 shrink-0 flex items-center justify-center shadow-inner group-hover:border-[#D9A036]/40 transition-colors"
+                            >
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500"
+                                onError={(e) => { e.target.src = "https://via.placeholder.com/100?text=Vedamya"; }}
+                              />
                             </Link>
 
-                            {/* Info Typography Matrix */}
-                            <div className="flex-1 text-center sm:text-left space-y-1">
-                              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#976E2A]">
-                                {item.flavor || "Classic"} {item.weight ? `• ${item.weight}` : ""}
-                              </span>
-                              <h3 className="text-lg font-bold text-[#6b4f3a] tracking-tight group-hover:text-[#976E2A] transition-colors duration-300">
+                            {/* Product Info Matrix */}
+                            <div className="flex-1 text-center sm:text-left space-y-1.5 w-full">
+                              <div className="flex items-center justify-center sm:justify-start gap-2">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-[#D9A036] bg-[#FAF7F2] px-2.5 py-0.5 rounded-md border border-[#6b4f3a]/15">
+                                  {item.flavor || "Natural Sattu"} {item.weight ? `• ${item.weight}` : ""}
+                                </span>
+                              </div>
+
+                              <h3 className="text-base sm:text-lg font-black text-[#2A1B12] leading-snug line-clamp-1">
                                 {item.name}
                               </h3>
-                              <p className="text-lg font-medium text-[#6b4f3a]/90 pt-1 font-sans">
-                                ₹{Number(item.price).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
-                              </p>
+
+                              <div className="flex items-center justify-center sm:justify-start gap-2 pt-0.5">
+                                <span className="text-base sm:text-xl font-black text-[#2A1B12]">
+                                  ₹{itemPrice.toLocaleString("en-IN")}
+                                </span>
+                                <span className="text-xs text-[#6b4f3a] font-bold">each</span>
+                              </div>
+
                               {isMaxReached && (
-                                <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md inline-block mt-1">
-                                  That's all stock left ({maxStock} {maxStock === 1 ? 'unit' : 'units'})
+                                <span className="text-[11px] font-bold text-amber-800 bg-amber-100/90 border border-amber-300 px-2.5 py-0.5 rounded-md inline-block mt-1">
+                                  Maximum available stock reached ({maxStock} unit{maxStock > 1 ? "s" : ""})
                                 </span>
                               )}
                             </div>
 
-                            {/* Quantity Controls */}
-                            <div className="flex items-center bg-[#FAF4E3]/30 border border-[#E3DBC5]/40 rounded-xl p-1 gap-2">
-                               <button 
-                                 onClick={() => updateQuantity(item.id, -1)}
-                                 className="w-8 h-8 flex items-center justify-center text-[#6b4f3a]/60 hover:text-[#976E2A] transition-colors"
-                               >
-                                 -
-                               </button>
-                               <span className="w-6 text-center text-[14px] font-bold font-sans text-[#6b4f3a]">{item.quantity || 1}</span>
-                               <button 
-                                 onClick={() => updateQuantity(item.id, 1)}
-                                 disabled={isMaxReached}
-                                 title={isMaxReached ? "That's all stock left" : "Increase quantity"}
-                                 className={`w-8 h-8 flex items-center justify-center transition-colors ${
-                                   isMaxReached 
-                                     ? "text-gray-300 cursor-not-allowed opacity-40" 
-                                     : "text-[#6b4f3a]/60 hover:text-[#976E2A]"
-                                 }`}
-                               >
-                                 +
-                               </button>
+                            {/* Quantity Controls & Stepper */}
+                            <div className="flex sm:flex-col items-center justify-between sm:justify-center gap-4 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                              <div className="flex items-center border-2 border-[#6b4f3a]/25 rounded-2xl overflow-hidden bg-[#FAF7F2] shadow-xs">
+                                <button 
+                                  onClick={() => updateQuantity(item.id, -1)}
+                                  className="w-9 h-9 flex items-center justify-center text-[#6b4f3a] hover:bg-[#6b4f3a]/15 transition-colors font-bold cursor-pointer"
+                                  title="Decrease Quantity"
+                                >
+                                  <Minus size={15} />
+                                </button>
+                                <span className="w-10 text-center text-sm font-black text-[#2A1B12]">
+                                  {item.quantity || 1}
+                                </span>
+                                <button 
+                                  onClick={() => updateQuantity(item.id, 1)}
+                                  disabled={isMaxReached}
+                                  title={isMaxReached ? "Maximum stock reached" : "Increase Quantity"}
+                                  className={`w-9 h-9 flex items-center justify-center transition-colors font-bold ${
+                                    isMaxReached 
+                                      ? "text-gray-300 cursor-not-allowed opacity-40" 
+                                      : "text-[#6b4f3a] hover:bg-[#6b4f3a]/15 cursor-pointer"
+                                  }`}
+                                >
+                                  <Plus size={15} />
+                                </button>
+                              </div>
+
+                              {/* Item Total Price */}
+                              <div className="text-right sm:text-center">
+                                <p className="text-xs text-[#6b4f3a] font-bold uppercase tracking-wider">Item Total</p>
+                                <p className="text-lg font-black text-[#2A1B12]">
+                                  ₹{itemTotal.toLocaleString("en-IN")}
+                                </p>
+                              </div>
                             </div>
 
-                            {/* Minimalist Removal Node */}
+                            {/* Trash Delete Action */}
                             <button
                               onClick={() => removeFromCart(item.id)}
-                              className="sm:mr-2 p-3.5 rounded-xl bg-[#FAF4E3]/50 text-[#6b4f3a]/40 border border-[#E3DBC5]/30 hover:bg-red-50/60 hover:text-red-600 hover:border-red-100 transition-all duration-300 group/trash"
+                              className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0"
+                              title="Remove Item"
                               aria-label="Remove item"
                             >
-                              <Trash2 size={15} strokeWidth={1.5} className="group-hover/trash:scale-105 transition-transform" />
+                              <Trash2 size={18} />
                             </button>
                           </motion.div>
                         );
@@ -205,51 +229,59 @@ const Cart = () => {
             </AnimatePresence>
           </div>
 
-          {/* SUMMARY SIDEBAR */}
+          {/* ORDER SUMMARY SIDEBAR */}
           {cart.length > 0 && (
-            <aside className="lg:col-span-4 w-full sticky top-32">
+            <aside className="lg:col-span-4 w-full sticky top-28">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: premiumEase }}
-                className="bg-[#FFFDF6] rounded-[24px] border border-[#E3DBC5]/70 shadow-[0_30px_70px_rgba(32,59,35,0.04)] p-8 relative overflow-hidden"
+                transition={{ duration: 0.5, ease: premiumEase }}
+                className="bg-white rounded-3xl border-2 border-[#D9A036]/40 p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden"
               >
-                {/* Micro Fine-Art Ornament */}
-                <div className="absolute top-0 right-0 p-6 opacity-20 pointer-events-none">
-                  <Sparkles size={15} className="text-[#976E2A]" />
+                {/* Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-[#6b4f3a]/15">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#D9A036]" />
+                    <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-[#2A1B12]">
+                      Order Summary
+                    </h2>
+                  </div>
+                  <span className="text-xs font-black uppercase bg-[#FAF7F2] px-2.5 py-1 rounded-full text-[#6b4f3a] border border-[#6b4f3a]/20">
+                    {cart.length} Item{cart.length !== 1 ? "s" : ""}
+                  </span>
                 </div>
 
-                <h2 className="text-md font-bold uppercase tracking-wider text-[#6b4f3a] mb-6 border-b border-[#E3DBC5]/40 pb-4">
-                  Order Summary
-                </h2>
-
-                {/* Ledger Breakdown Row Vectors */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between items-baseline text-[12px] uppercase tracking-widest text-[#6b4f3a]/60 font-sans">
-                    <span>Subtotal</span>
-                    <span className="text-[#6b4f3a] font-bold">
+                {/* Ledger Calculations */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-sm font-bold text-[#6b4f3a]">
+                    <span className="uppercase tracking-wider">Subtotal</span>
+                    <span className="text-[#2A1B12] font-black text-lg">
                       ₹{total.toLocaleString("en-IN")}
                     </span>
                   </div>
-                  <div className="flex justify-between items-baseline text-[12px] uppercase tracking-widest text-[#6b4f3a]/60">
-                    <span>Shipping</span>
-                    <span className="text-[#976E2A] italic tracking-normal normal-case font-serif text-[13px]">
-                      Complimentary
+
+                  <div className="flex justify-between items-center text-sm font-bold text-[#6b4f3a]">
+                    <span className="uppercase tracking-wider">Express Delivery</span>
+                    <span className="text-emerald-700 font-black uppercase bg-emerald-100 px-2.5 py-0.5 rounded-md text-xs">
+                      FREE
                     </span>
                   </div>
-                  <div className="flex justify-between items-baseline text-[12px] uppercase tracking-widest text-[#6b4f3a]/60 font-sans">
-                    <span>GST (Included)</span>
-                    <span className="text-[#6b4f3a] font-bold">₹0.00</span>
+
+                  <div className="flex justify-between items-center text-sm font-bold text-[#6b4f3a]">
+                    <span className="uppercase tracking-wider">Taxes & GST</span>
+                    <span className="text-emerald-700 font-bold text-xs uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      INCLUDED
+                    </span>
                   </div>
 
-                  {/* PREMIUM OPTIONAL LUXURY ADD-ON (Gift Inscription) */}
-                  <div className="pt-2 border-t border-[#E3DBC5]/30">
+                  {/* OPTIONAL GIFT NOTE ADD-ON */}
+                  <div className="pt-3 border-t border-[#6b4f3a]/15">
                     <button 
                       onClick={() => setIsGiftNoteOpen(!isGiftNoteOpen)}
-                      className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#976E2A] hover:text-[#6b4f3a] transition-colors"
+                      className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#6b4f3a] hover:text-[#D9A036] transition-colors cursor-pointer"
                     >
-                      <Gift size={13} strokeWidth={1.8} />
-                      <span>{isGiftNoteOpen ? "Remove gift note" : "Add a gift note"}</span>
+                      <Gift size={15} className="text-[#D9A036]" />
+                      <span>{isGiftNoteOpen ? "− Remove Gift Message" : "+ Add Complimentary Gift Message"}</span>
                     </button>
                     
                     <AnimatePresence>
@@ -264,64 +296,58 @@ const Cart = () => {
                           <textarea
                             value={giftNote}
                             onChange={(e) => setGiftNote(e.target.value)}
-                            placeholder="Write your message here..."
+                            placeholder="Type your gift message for the recipient here..."
                             maxLength={180}
-                            className="w-full h-20 bg-[#FAF4E3]/40 border border-[#E3DBC5]/60 rounded-xl p-3 text-[12px] italic text-[#6b4f3a] placeholder-[#6b4f3a]/30 focus:outline-none focus:border-[#976E2A]/50 resize-none font-sans"
+                            className="w-full h-20 bg-[#FAF7F2] border-2 border-[#6b4f3a]/25 rounded-2xl p-3 text-xs font-bold text-[#2A1B12] placeholder-[#6b4f3a]/50 focus:outline-none focus:border-[#D9A036] focus:bg-white resize-none"
                           />
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  {/* Vault Valuation Divider Line */}
-                  <div className="pt-5 border-t border-dashed border-[#E3DBC5] flex justify-between items-end">
-                    <div className="space-y-0.5">
-                      <span className="text-[11px] font-bold text-[#976E2A] uppercase tracking-[0.25em] block">
-                        Total Value
+                  {/* TOTAL AMOUNT DIVIDER */}
+                  <div className="pt-4 border-t-2 border-[#2A1B12] flex justify-between items-baseline">
+                    <div>
+                      <span className="text-sm font-black text-[#2A1B12] uppercase tracking-wider block">
+                        Total Amount
                       </span>
-                      <span className="text-[11px] text-[#6b4f3a]/40 italic font-serif block">
-                        Include wrapping
+                      <span className="text-[11px] text-emerald-700 font-bold block mt-0.5">
+                        ✓ Includes all taxes & free shipping
                       </span>
                     </div>
-                    <span className="text-3xl font-bold text-[#6b4f3a] tracking-tight font-sans">
+                    <span className="text-3xl sm:text-4xl font-black text-[#2A1B12] tracking-tight">
                       ₹{total.toLocaleString("en-IN")}
                     </span>
                   </div>
                 </div>
 
-                {/* Primary Secure Action Node Button */}
+                {/* CHECKOUT NOW PRIMARY BUTTON */}
                 <button
                   onClick={handleCheckout}
-                  className="w-full py-4 bg-[#6b4f3a] text-[#FFFDF6] font-bold text-[12px] uppercase tracking-[0.25em] rounded-xl hover:bg-[#976E2A] hover:shadow-[0_12px_30px_rgba(151,110,42,0.15)] transition-all duration-500 shadow-[0_10px_25px_rgba(32,59,35,0.08)] mb-8 flex items-center justify-center gap-2 group/checkout"
+                  className="w-full py-4.5 bg-gradient-to-r from-[#6b4f3a] via-[#523d2d] to-[#2A1B12] text-white font-black text-sm sm:text-base uppercase tracking-widest rounded-2xl hover:shadow-2xl hover:scale-[1.01] active:scale-95 transition-all duration-300 shadow-xl flex items-center justify-center gap-2.5 border-2 border-[#D9A036]/50 cursor-pointer group"
                 >
-                  <span>Checkout Now</span>
-                  <ChevronRight size={14} className="group-hover/checkout:translate-x-1 transition-transform" />
+                  <Lock size={18} className="text-[#D9A036]" />
+                  <span>Proceed to Checkout</span>
+                  <ArrowRight size={18} className="text-[#D9A036] group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                {/* Trust Certificate Stamp Components */}
-                <div className="grid grid-cols-1 gap-4 pt-6 border-t border-[#E3DBC5]/40">
-                  {[
-                    { icon: ShieldCheck, title: "Vault Security", sub: "Pillar Layer Encryption" },
-                    { icon: Truck, title: "Priority Delivery", sub: "Climate Controlled Fleet" },
-                    { icon: RotateCcw, title: "Registry Guarantee", sub: "30-Day Escrow Window" },
-                  ].map((badge, i) => {
-                    const Icon = badge.icon;
-                    return (
-                      <div key={i} className="flex items-center gap-4">
-                        <div className="w-9 h-9 rounded-xl bg-[#FAF4E3]/70 border border-[#E3DBC5]/60 flex items-center justify-center text-[#976E2A] shrink-0 shadow-none">
-                          <Icon size={15} strokeWidth={1.5} />
-                        </div>
-                        <div className="space-y-0.5">
-                          <p className="text-[11px] font-bold text-[#6b4f3a] uppercase tracking-wider">
-                            {badge.title}
-                          </p>
-                          <p className="text-[12px] font-serif italic text-[#6b4f3a]/40 leading-none">
-                            {badge.sub}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                {/* TRUST BADGES */}
+                <div className="grid grid-cols-1 gap-3 pt-4 border-t border-[#6b4f3a]/15 text-xs font-extrabold text-[#6b4f3a]">
+                  <div className="flex items-center gap-3 bg-[#FAF7F2] p-3 rounded-2xl border border-[#6b4f3a]/10">
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-black text-[#2A1B12]">100% Secure Encrypted Checkout</p>
+                      <p className="text-[11px] text-[#6b4f3a] font-medium">SSL Encrypted Payment Gateway</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-[#FAF7F2] p-3 rounded-2xl border border-[#6b4f3a]/10">
+                    <Truck className="w-5 h-5 text-[#D9A036] flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-black text-[#2A1B12]">Express Doorstep Shipping</p>
+                      <p className="text-[11px] text-[#6b4f3a] font-medium">Shipped directly from our facility</p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             </aside>

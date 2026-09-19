@@ -120,9 +120,9 @@ export default async function handler(req, res) {
     const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
     const smtpPort = Number(process.env.SMTP_PORT) || 465;
     const smtpSecure = process.env.SMTP_SECURE === "true" || smtpPort === 465;
-    const smtpUser = process.env.SMTP_USER;
+    const smtpUser = process.env.SMTP_USER || "vedamyafoods@gmail.com";
     const smtpPass = process.env.SMTP_PASS;
-    const smtpFrom = process.env.SMTP_FROM || `"Vedamya Foods" <${smtpUser || "noreply@vedamyafoods.com"}>`;
+    const smtpFrom = process.env.SMTP_FROM || `"Vedamya Foods" <${smtpUser}>`;
 
     if (!smtpUser || !smtpPass) {
       console.warn("⚠️ SMTP credentials not set. OTP (dev only):", otp);

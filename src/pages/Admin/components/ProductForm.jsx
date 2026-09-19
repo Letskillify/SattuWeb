@@ -142,34 +142,34 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-7">
       
       {/* SECTION 1: BASIC INFO */}
       <div className="space-y-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-[#E5DEC9]">
-          <Package className="text-[#6b4f3a]" size={18} />
-          <h3 className="text-xs font-poppins font-black uppercase tracking-widest text-[#2A1B12]">
+        <div className="flex items-center gap-2.5 pb-2.5 border-b border-[#E5DEC9]">
+          <Package className="text-[#6b4f3a]" size={20} />
+          <h3 className="text-xs sm:text-sm font-poppins font-black uppercase tracking-wider text-[#2A1B12]">
             1. Basic Product Identity
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
               Product Name
             </label>
             <input
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-xs font-medium bg-[#FDFBF7]"
+              className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-sm font-semibold bg-[#FDFBF7]"
               placeholder="e.g. Premium Elaichi Sattu Mix"
               {...register("name", { required: true })}
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
               Flavor Category
             </label>
             <select
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-xs font-medium bg-[#FDFBF7]"
+              className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-sm font-semibold bg-[#FDFBF7]"
               {...register("flavor", { required: true })}
             >
               <option value="">Select Flavor</option>
@@ -182,12 +182,12 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+        <div className="space-y-2">
+          <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
             Product Description
           </label>
           <textarea
-            className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-xs font-medium bg-[#FDFBF7] min-h-[80px]"
+            className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none transition-all text-sm font-semibold bg-[#FDFBF7] min-h-[90px]"
             placeholder="Describe traditional roasting, nutritional benefits..."
             rows={3}
             {...register("description")}
@@ -197,30 +197,30 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
 
       {/* SECTION 2: QUANTITY & NUMERIC STOCK VARIANTS */}
       <div className="space-y-4 pt-2">
-        <div className="flex items-center justify-between pb-2 border-b border-[#E5DEC9]">
-          <div className="flex items-center gap-2">
-            <Layers className="text-[#976E2A]" size={18} />
-            <h3 className="text-xs font-poppins font-black uppercase tracking-widest text-[#2A1B12]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-[#E5DEC9]">
+          <div className="flex items-center gap-2.5">
+            <Layers className="text-[#976E2A]" size={20} />
+            <h3 className="text-xs sm:text-sm font-poppins font-black uppercase tracking-wider text-[#2A1B12]">
               2. Quantity & Numeric Stock Variants
             </h3>
           </div>
           <button
             type="button"
             onClick={handleAddVariant}
-            className="px-3 py-1.5 rounded-xl bg-[#6b4f3a]/10 text-[#6b4f3a] hover:bg-[#6b4f3a] hover:text-white text-xs font-bold transition-all flex items-center gap-1 border border-[#6b4f3a]/20"
+            className="px-4 py-2 rounded-2xl bg-[#6b4f3a]/15 text-[#6b4f3a] hover:bg-[#6b4f3a] hover:text-white text-xs sm:text-sm font-extrabold transition-all flex items-center gap-1.5 border border-[#6b4f3a]/30 self-start sm:self-auto cursor-pointer"
           >
-            <Plus size={14} /> Add Quantity Tier
+            <Plus size={16} /> Add Quantity Tier
           </button>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {variants.map((v, idx) => (
             <div
               key={idx}
-              className="grid grid-cols-1 sm:grid-cols-5 gap-3 p-4 bg-[#FDFBF7] rounded-2xl border border-[#E5DEC9] items-center"
+              className="grid grid-cols-1 sm:grid-cols-5 gap-3.5 p-4 md:p-5 bg-[#FDFBF7] rounded-3xl border border-[#E5DEC9] items-center"
             >
               <div>
-                <label className="text-[10px] font-bold text-[#7A6E63] uppercase block mb-1">
+                <label className="text-xs font-extrabold text-[#7A6E63] uppercase block mb-1.5">
                   Weight / Quantity
                 </label>
                 <input
@@ -228,11 +228,11 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   value={v.weight}
                   onChange={(e) => handleVariantChange(idx, "weight", e.target.value)}
                   placeholder="e.g. 250g"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5DEC9] text-xs font-bold bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5DEC9] text-sm font-bold bg-white"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-[#7A6E63] uppercase block mb-1">
+                <label className="text-xs font-extrabold text-[#7A6E63] uppercase block mb-1.5">
                   Sale Price (₹)
                 </label>
                 <input
@@ -240,11 +240,11 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   value={v.price}
                   onChange={(e) => handleVariantChange(idx, "price", e.target.value)}
                   placeholder="149"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5DEC9] text-xs font-bold bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5DEC9] text-sm font-bold bg-white"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-[#7A6E63] uppercase block mb-1">
+                <label className="text-xs font-extrabold text-[#7A6E63] uppercase block mb-1.5">
                   MRP (₹)
                 </label>
                 <input
@@ -252,11 +252,11 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   value={v.original_price}
                   onChange={(e) => handleVariantChange(idx, "original_price", e.target.value)}
                   placeholder="199"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5DEC9] text-xs font-bold bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5DEC9] text-sm font-bold bg-white"
                 />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-[#7A6E63] uppercase block mb-1">
+                <label className="text-xs font-extrabold text-[#7A6E63] uppercase block mb-1.5">
                   Stock Units
                 </label>
                 <input
@@ -265,7 +265,7 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   value={v.stock_count}
                   onChange={(e) => handleVariantChange(idx, "stock_count", e.target.value)}
                   placeholder="50"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5DEC9] text-xs font-bold bg-white text-emerald-800"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5DEC9] text-sm font-black bg-white text-emerald-800"
                 />
               </div>
               <div className="flex justify-end sm:pt-4">
@@ -273,10 +273,10 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
                   type="button"
                   onClick={() => handleRemoveVariant(idx)}
                   disabled={variants.length <= 1}
-                  className="p-2 rounded-xl text-red-500 hover:bg-red-100 disabled:opacity-30 transition-colors"
+                  className="p-2.5 rounded-xl text-red-600 hover:bg-red-100 disabled:opacity-30 transition-colors cursor-pointer"
                   title="Remove Tier"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={18} />
                 </button>
               </div>
             </div>
@@ -286,16 +286,16 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
 
       {/* SECTION 3: SPECS & NUTRITION */}
       <div className="space-y-4 pt-2">
-        <div className="flex items-center gap-2 pb-2 border-b border-[#E5DEC9]">
-          <FileText className="text-[#6b4f3a]" size={18} />
-          <h3 className="text-xs font-poppins font-black uppercase tracking-widest text-[#2A1B12]">
+        <div className="flex items-center gap-2.5 pb-2.5 border-b border-[#E5DEC9]">
+          <FileText className="text-[#6b4f3a]" size={20} />
+          <h3 className="text-xs sm:text-sm font-poppins font-black uppercase tracking-wider text-[#2A1B12]">
             3. Ingredients & Preparation Specs
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
               Rating (0 to 5)
             </label>
             <input
@@ -303,41 +303,41 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
               step="0.1"
               min="0"
               max="5"
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7]"
+              className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-sm font-semibold bg-[#FDFBF7]"
               placeholder="4.5"
               {...register("rating")}
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
               Ingredients
             </label>
             <input
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7]"
+              className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-sm font-semibold bg-[#FDFBF7]"
               placeholder="e.g. Roasted Chana Gram, Barley, Elaichi..."
               {...register("ingredients")}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
               Nutritional Facts
             </label>
             <textarea
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7] min-h-[70px]"
+              className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-sm font-semibold bg-[#FDFBF7] min-h-[80px]"
               placeholder="Per 100g: Protein 20g, Fiber 8g..."
               rows={2}
               {...register("nutritional_info")}
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#2A1B12] uppercase tracking-wider">
+          <div className="space-y-2">
+            <label className="text-xs sm:text-sm font-extrabold text-[#2A1B12] uppercase tracking-wider block">
               How to Prepare
             </label>
             <textarea
-              className="w-full px-4 py-3 rounded-xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-xs font-medium bg-[#FDFBF7] min-h-[70px]"
+              className="w-full px-4 py-3.5 rounded-2xl border border-[#E5DEC9] focus:border-[#6b4f3a] outline-none text-sm font-semibold bg-[#FDFBF7] min-h-[80px]"
               placeholder="Mix 2 tbsp in chilled water or milk..."
               rows={2}
               {...register("how_to_prepare")}
@@ -347,10 +347,10 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
       </div>
 
       {/* SECTION 4: IMAGE UPLOAD */}
-      <div className="space-y-2 pt-2">
-        <div className="flex items-center gap-2 pb-2 border-b border-[#E5DEC9]">
-          <ImageIcon className="text-[#976E2A]" size={18} />
-          <h3 className="text-xs font-poppins font-black uppercase tracking-widest text-[#2A1B12]">
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center gap-2.5 pb-2.5 border-b border-[#E5DEC9]">
+          <ImageIcon className="text-[#976E2A]" size={20} />
+          <h3 className="text-xs sm:text-sm font-poppins font-black uppercase tracking-wider text-[#2A1B12]">
             4. Product Photography
           </h3>
         </div>
@@ -358,24 +358,24 @@ const SattuProductForm = ({ onSuccess, isEdit = false, product = null }) => {
           type="file"
           multiple
           accept="image/*"
-          className="w-full px-4 py-3 rounded-xl border border-dashed border-[#6b4f3a] hover:border-[#2A1B12] transition-colors text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#6b4f3a]/10 file:text-[#6b4f3a] cursor-pointer bg-[#FDFBF7]"
+          className="w-full px-4 py-3.5 rounded-2xl border border-dashed border-[#6b4f3a] hover:border-[#2A1B12] transition-colors text-xs sm:text-sm file:mr-4 file:py-2.5 file:px-4.5 file:rounded-xl file:border-0 file:text-xs sm:file:text-sm file:font-bold file:bg-[#6b4f3a]/15 file:text-[#6b4f3a] cursor-pointer bg-[#FDFBF7]"
           {...register("images")}
         />
       </div>
 
       {/* FOOTER ACTIONS */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#E5DEC9]">
+      <div className="flex flex-wrap items-center justify-end gap-4 pt-5 border-t border-[#E5DEC9]">
         {formState.isSubmitted && !loading && !error && (
-          <span className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+          <span className="text-xs sm:text-sm font-extrabold text-emerald-700 flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
             Product Saved Successfully
           </span>
         )}
-        {error && <span className="text-xs font-bold text-red-600">Error: {error}</span>}
+        {error && <span className="text-xs sm:text-sm font-extrabold text-red-600">Error: {error}</span>}
         <button
           type="submit"
           disabled={loading}
-          className="px-8 py-3 rounded-2xl bg-[#6b4f3a] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#6b4f3a]/20 hover:bg-[#2A1B12] transition-all disabled:opacity-50"
+          className="px-8 py-3.5 rounded-2xl bg-[#6b4f3a] text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-lg shadow-[#6b4f3a]/25 hover:bg-[#2A1B12] transition-all disabled:opacity-50 cursor-pointer"
         >
           {loading ? "Saving Details..." : isEdit ? "Update Sattu Product" : "Publish Sattu Product"}
         </button>

@@ -20,7 +20,7 @@ const SectionHeader = ({ title, subtitle }) => {
       {/* Subtitle with side boundary borders */}
       <div className="flex items-center justify-center gap-4 max-w-md mx-auto border-y border-[#6b4f3a]/20 py-2">
         <span className="text-[14px] sm:text-sm font-poppins font-bold text-[#6b4f3a] uppercase tracking-[0.3em] whitespace-nowrap">
-          {subtitle || "Natural • Nutritious • Wholesome"}
+          {subtitle || "Natural • Nutritious "}
         </span>
       </div>
 
