@@ -22,14 +22,19 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
-// Helper to upload media (images or videos) to Cloudinary
+// Helper to upload media (images or videos) to Cloudinary reading from environment variables
 const uploadMediaToCloudinary = async (file, resourceType = "auto") => {
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+  const assetFolder = import.meta.env.VITE_CLOUDINARY_ASSET_FOLDER;
+
   const data = new FormData();
   data.append("file", file);
-  data.append("upload_preset", "Mahanta_group");
+  data.append("upload_preset", uploadPreset);
+  data.append("folder", assetFolder);
 
   const res = await axios.post(
-    `https://api.cloudinary.com/v1_1/dlsbj8nug/${resourceType}/upload`,
+    `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
     data
   );
 

@@ -149,12 +149,28 @@ const Account = () => {
           wishlist: wishlistSnap.size
         });
 
-        // 4. Fetch User Orders
+        // 4. Fetch User Orders (by userId + by email for linked guest orders)
         const ordersRef = collection(db, "orders");
+        const byIdMap = new Map();
+
+        // Fetch by userId
         const ordersQuery = query(ordersRef, where("userId", "==", user.uid));
         const ordersSnap = await getDocs(ordersQuery);
-        const ordersList = ordersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        ordersSnap.docs.forEach(doc => byIdMap.set(doc.id, { id: doc.id, ...doc.data() }));
 
+        // Also fetch by customerEmail (catches not-yet-linked guest orders)
+        if (user.email) {
+          const normalizedEmail = user.email.trim().toLowerCase();
+          const emailQuery = query(ordersRef, where("customerEmail", "==", normalizedEmail));
+          const emailSnap = await getDocs(emailQuery);
+          emailSnap.docs.forEach(doc => {
+            if (!byIdMap.has(doc.id)) {
+              byIdMap.set(doc.id, { id: doc.id, ...doc.data() });
+            }
+          });
+        }
+
+        const ordersList = Array.from(byIdMap.values());
         ordersList.sort((a, b) => {
           const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0);
           const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0);

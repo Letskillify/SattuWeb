@@ -34,11 +34,8 @@ const Cart = () => {
   const premiumEase = [0.16, 1, 0.3, 1];
 
   const handleCheckout = () => {
-    if (!user) {
-      navigate("/login?redirect=checkout");
-    } else {
-      navigate("/checkout");
-    }
+    // Allow both logged-in users and guests to proceed to checkout
+    navigate("/checkout");
   };
 
   if (loading) {

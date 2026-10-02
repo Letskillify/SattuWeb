@@ -29,12 +29,17 @@ import { useAuth } from "../../components/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export const uploadToCloudinary = async (file) => {
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ;
+  const assetFolder = import.meta.env.VITE_CLOUDINARY_ASSET_FOLDER ;
+
   const data = new FormData();
   data.append("file", file);
-  data.append("upload_preset", "Mahanta_group");
+  data.append("upload_preset", uploadPreset);
+  data.append("folder", assetFolder);
 
   const res = await axios.post(
-    "https://api.cloudinary.com/v1_1/dlsbj8nug/image/upload",
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
     data
   );
 

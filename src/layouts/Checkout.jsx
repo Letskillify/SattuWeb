@@ -342,7 +342,7 @@ const Checkout = () => {
 
     if (formData.paymentMethod === "online") {
       const options = {
-        key: "rzp_test_YOUR_KEY_HERE", // Replace with your actual Razorpay Key ID
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_YOUR_KEY_HERE", // Replace with your actual Razorpay Key ID
         amount: total * 100, // amount in paisa
         currency: "INR",
         name: "Vedamya Foods",
