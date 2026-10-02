@@ -127,7 +127,7 @@ const ProductCard = ({ product, idx, triggerToast }) => {
           {product.flavor || "Classic Roasted"}
         </span>
         
-        <h3 className="text-base font-poppins font-bold text-[#2E1A0C] mb-1 tracking-tight leading-snug line-clamp-1">
+        <h3 className="text-[22px] font-poppins font-bold text-[#2E1A0C] mb-1 tracking-tight leading-snug line-clamp-1">
           {product.name}
         </h3>
 
@@ -151,11 +151,11 @@ const ProductCard = ({ product, idx, triggerToast }) => {
                   key={vIdx}
                   type="button"
                   onClick={() => setSelectedVariantIdx(vIdx)}
-                  className={`px-2.5 py-1 rounded text-xs font-bold transition-all border ${
+                  className={`px-2.5 py-1 rounded text-s font-bold transition-all border ${
                     selectedVariantIdx === vIdx
                       ? "bg-[#6b4f3a] text-white border-[#6b4f3a]"
                       : v.stock_status === "Out of Stock"
-                      ? "bg-red-50 text-red-400 border-red-200 line-through opacity-70"
+                      ? "bg-red-50 text-red-800 border-red-200 line-through opacity-70"
                       : "bg-gray-50 text-gray-600 border-gray-200 hover:border-[#6b4f3a]"
                   }`}
                 >
