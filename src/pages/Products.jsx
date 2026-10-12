@@ -28,7 +28,6 @@ import { useStore } from "../components/StoreProvider";
 
 const ALL_CATEGORIES = [
   "All",
-  "Sattu Mixes",
   "Healthy Snacks",
   "Spices & Herbs",
   "Superfoods & Grains",
@@ -303,7 +302,7 @@ const Products = () => {
   const [inStockOnly, setInStockOnly] = useState(false);
   const [onSaleOnly, setOnSaleOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
-  const [sortBy, setSortBy] = useState("featured");
+  const [sortBy, setSortBy] = useState("recently-uploaded");
   
   // Mobile Filter Drawer Toggle
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -344,7 +343,6 @@ const Products = () => {
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (selectedCategory !== "All") count++;
-    if (selectedFlavor !== "All") count++;
     if (selectedPriceRange !== 0 || minPriceInput || maxPriceInput) count++;
     if (selectedWeight !== "All Sizes") count++;
     if (inStockOnly) count++;
@@ -352,12 +350,26 @@ const Products = () => {
     if (minRating > 0) count++;
     if (searchTerm) count++;
     return count;
-  }, [selectedCategory, selectedFlavor, selectedPriceRange, minPriceInput, maxPriceInput, selectedWeight, inStockOnly, onSaleOnly, minRating, searchTerm]);
+  }, [selectedCategory, selectedPriceRange, minPriceInput, maxPriceInput, selectedWeight, inStockOnly, onSaleOnly, minRating, searchTerm]);
 
-  // Filtered & Sorted Products computation
+  // Dynamic Categories including custom categories created in Admin (only other products)
+  const dynamicCategories = useMemo(() => {
+    const set = new Set(ALL_CATEGORIES);
+    products.forEach((p) => {
+      if (p.productType === "other" && p.category && p.category.trim()) {
+        set.add(p.category.trim());
+      }
+    });
+    return Array.from(set);
+  }, [products]);
+
+  // Filtered & Sorted Products computation - NO SATTU PRODUCTS
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
+        // EXCLUDE SATTU PRODUCTS: ONLY SHOW OTHER PRODUCTS
+        if (p.productType !== "other") return false;
+
         // Search Filter
         const queryLower = searchTerm.toLowerCase().trim();
         const matchesSearch =
@@ -366,22 +378,13 @@ const Products = () => {
           p.description?.toLowerCase().includes(queryLower) ||
           p.ingredients?.toLowerCase().includes(queryLower) ||
           p.category?.toLowerCase().includes(queryLower) ||
-          p.flavor?.toLowerCase().includes(queryLower);
+          p.subCategory?.toLowerCase().includes(queryLower);
 
         // Category Filter
         let matchesCat = true;
         if (selectedCategory !== "All") {
-          if (selectedCategory === "Sattu Mixes") {
-            matchesCat = p.productType !== "other" || p.category === "Sattu Mixes";
-          } else {
-            matchesCat = p.category?.toLowerCase() === selectedCategory.toLowerCase();
-          }
+          matchesCat = p.category?.toLowerCase() === selectedCategory.toLowerCase();
         }
-
-        // Flavor Filter
-        const matchesFlavor =
-          selectedFlavor === "All" ||
-          (p.flavor && p.flavor.toLowerCase() === selectedFlavor.toLowerCase());
 
         // Price Filter
         let minBound = 0;
@@ -420,7 +423,7 @@ const Products = () => {
         // Rating Filter
         const matchesRating = (p.rating || 4.5) >= minRating;
 
-        return matchesSearch && matchesCat && matchesFlavor && matchesPrice && matchesWeight && matchesStock && matchesSale && matchesRating;
+        return matchesSearch && matchesCat && matchesPrice && matchesWeight && matchesStock && matchesSale && matchesRating;
       })
       .sort((a, b) => {
         const priceA = a.price || a.variants?.[0]?.price || 0;
@@ -428,14 +431,26 @@ const Products = () => {
         const discountA = (a.original_price || priceA) - priceA;
         const discountB = (b.original_price || priceB) - priceB;
 
+        // RECENTLY UPLOADED SORT (Newest First)
+        if (sortBy === "recently-uploaded" || sortBy === "newest") {
+          const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+          const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+          return timeB - timeA;
+        }
         if (sortBy === "price-asc") return priceA - priceB;
         if (sortBy === "price-desc") return priceB - priceA;
         if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
-        if (sortBy === "newest") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
         if (sortBy === "discount") return discountB - discountA;
+        if (sortBy === "featured") {
+          if (b.isFeatured && !a.isFeatured) return 1;
+          if (a.isFeatured && !b.isFeatured) return -1;
+          const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+          const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+          return timeB - timeA;
+        }
         return 0;
       });
-  }, [products, searchTerm, selectedCategory, selectedFlavor, selectedPriceRange, minPriceInput, maxPriceInput, selectedWeight, inStockOnly, onSaleOnly, minRating, sortBy]);
+  }, [products, searchTerm, selectedCategory, selectedPriceRange, minPriceInput, maxPriceInput, selectedWeight, inStockOnly, onSaleOnly, minRating, sortBy]);
 
   const resetFilters = () => {
     setSearchTerm("");
@@ -476,7 +491,7 @@ const Products = () => {
           Product Category
         </label>
         <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1 scrollbar-none">
-          {ALL_CATEGORIES.map((cat) => (
+          {dynamicCategories.map((cat) => (
             <button
               key={cat}
               type="button"
@@ -489,29 +504,6 @@ const Products = () => {
             >
               <span>{cat}</span>
               {selectedCategory === cat && <Check size={15} />}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. FLAVOR / BLEND TYPE */}
-      <div className="space-y-2.5 pt-2 border-t border-[#E5DEC9]/60">
-        <label className="text-xs font-poppins font-extrabold uppercase tracking-wider text-[#976E2A] block">
-          Flavor & Blend
-        </label>
-        <div className="flex flex-wrap gap-1.5">
-          {FLAVORS.map((flavor) => (
-            <button
-              key={flavor}
-              type="button"
-              onClick={() => setSelectedFlavor(flavor)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
-                selectedFlavor === flavor
-                  ? "bg-[#976E2A] text-white border-[#976E2A] shadow-2xs"
-                  : "bg-white text-[#2A1B12] border-[#E5DEC9] hover:border-[#976E2A]"
-              }`}
-            >
-              {flavor}
             </button>
           ))}
         </div>
@@ -656,11 +648,11 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#2A1B12]">
       <PageHeader
-        title="Our Heritage Product Range"
-        subtitle="Roasted Sattu Blends, Organic Foods & Pure Spices"
+        title="Organic & Artisanal Products"
+        subtitle="Wholesome Snacks, Pure Spices, Cold-Pressed Oils & Superfoods"
         breadcrumbItems={[
           { label: "Home", path: "/" },
-          { label: "Products" },
+          { label: "Organic Products" },
         ]}
       />
 
@@ -677,7 +669,7 @@ const Products = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search sattu, snacks, spices..."
+                placeholder="Search organic snacks, spices, oils..."
                 className="w-full bg-[#FAF7F2] border border-[#E5DEC9] focus:border-[#6b4f3a] focus:ring-1 focus:ring-[#6b4f3a] outline-none py-3 pl-11 pr-10 rounded-2xl text-sm font-semibold text-[#2A1B12] transition-all"
               />
               {searchTerm && (
@@ -715,12 +707,12 @@ const Products = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="bg-transparent font-extrabold text-[#2A1B12] outline-none cursor-pointer"
                 >
-                  <option value="featured">Featured Blends</option>
+                  <option value="recently-uploaded">Recently Uploaded (Newest)</option>
+                  <option value="featured">Featured Items</option>
                   <option value="price-asc">Price: Low to High</option>
                   <option value="price-desc">Price: High to Low</option>
                   <option value="rating">Highest Rated</option>
                   <option value="discount">Highest Discount</option>
-                  <option value="newest">Newest Arrivals</option>
                 </select>
               </div>
 

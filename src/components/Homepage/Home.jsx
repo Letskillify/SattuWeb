@@ -2,6 +2,7 @@ import React from 'react';
 import Hero from '../Sattu/Hero';
 import BenefitsStrip from '../Sattu/BenefitsStrip';
 import Bestsellers from '../Sattu/Bestsellers';
+import ExploreOtherProducts from './ExploreOtherProducts';
 import FlavorsSection from '../Sattu/FlavorsSection';
 import WhyChooseSection from '../Sattu/WhyChooseSection';
 import HowToMake from '../Sattu/HowToMake';
@@ -14,6 +15,7 @@ const Home = () => {
       <Hero />
       <Bestsellers />
       <BenefitsStrip />
+      <ExploreOtherProducts />
       {/* <FlavorsSection /> */}
       {/* <WhyChooseSection /> */}
       <HowToMake />

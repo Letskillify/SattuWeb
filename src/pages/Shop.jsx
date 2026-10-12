@@ -235,7 +235,9 @@ const Shop = () => {
       try {
         const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        setProducts(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        const all = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        // Show ONLY Sattu products (filter out any other products)
+        setProducts(all.filter((p) => p.productType !== "other"));
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -253,6 +255,7 @@ const Shop = () => {
   const flavors = ["All", "Classic Roasted", "Elaichi", "Rose", "Dry Fruit", "Chocolate", "Namkeen Spicy"];
 
   const filteredProducts = products.filter((p) => {
+    if (p.productType === "other") return false;
     const matchesSearch = p.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFlavor =
       selectedFlavor === "All" ||

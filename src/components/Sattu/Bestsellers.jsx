@@ -233,7 +233,10 @@ const BestsellerProducts = () => {
       try {
         const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        setProducts(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).slice(0, 4));
+        const all = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Show ONLY Sattu products (filter out any other products)
+        const sattuOnly = all.filter(p => p.productType !== "other");
+        setProducts(sattuOnly.slice(0, 4));
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {

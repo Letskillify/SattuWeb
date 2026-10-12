@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../../components/Firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { Shield, Lock, Mail, ArrowRight, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,11 +20,20 @@ const AdminLogin = () => {
     setError("");
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+      } catch (pErr) {
+        console.warn("Could not set local persistence:", pErr);
+      }
+      const userCred = await signInWithEmailAndPassword(auth, email.trim(), password);
+      // Persist Admin session
+      localStorage.setItem("isAdminLoggedIn", "true");
+      localStorage.setItem("adminEmail", email.trim().toLowerCase());
+      localStorage.setItem("adminLoginTime", new Date().toISOString());
       navigate("/admin");
     } catch (err) {
       console.error(err);
-      setError("Invalid administrative credentials.");
+      setError("Invalid administrative credentials. Please check your email and password.");
     } finally {
       setLoading(false);
     }
